@@ -1,0 +1,33 @@
+{
+    "manufacturer": "Akariiin Tech",
+    "keyboard_name": "007aLS",
+    "maintainer": "AkariiinMKII",
+    "bootloader": "stm32duino",
+    "diode_direction": "COL2ROW",
+    "features": {
+        "bootmagic": true,
+        "command": false,
+        "console": false,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true
+    },
+    "matrix_pins": {
+        "cols": ["A2"],
+        "rows": ["A6"]
+    },
+    "processor": "STM32F103",
+    "url": "https://github.com/AkariiinMKII/007aLS",
+    "usb": {
+        "device_version": "0.1.0",
+        "pid": "0x00C0",
+        "vid": "0x9C9E"
+    },
+    "layouts": {
+        "LAYOUT_7u_space": {
+            "layout": [
+                {"matrix": [0, 0], "x": 0, "y": 0, "w": 7}
+            ]
+        }
+    }
+}
