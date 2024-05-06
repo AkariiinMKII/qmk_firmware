@@ -3,7 +3,7 @@
     "keyboard_name": "MOD(el) M",
     "maintainer": "AkariiinMKII",
     "bootloader": "stm32duino",
-    "diode_direction": "COL2ROW",
+    "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,
         "command": false,
@@ -30,7 +30,7 @@
         "vid": "0x9C9E"
     },
     "dynamic_keymap": {
-        "layer_count": 2
+        "layer_count": 3
     },
     "layouts": {
         "LAYOUT_fullsize_ansi_wkl": {
@@ -152,7 +152,7 @@
                 {"matrix": [7, 11], "x": 16.25, "y": 5.5},
                 {"matrix": [7, 12], "x": 17.25, "y": 5.5},
 
-                {"matrix": [0, 12], "x": 18.5, "y": 5.5, "w": 2},
+                {"matrix": [0, 11], "x": 18.5, "y": 5.5, "w": 2},
                 {"matrix": [0, 13], "x": 20.5, "y": 5.5}
             ]
         }

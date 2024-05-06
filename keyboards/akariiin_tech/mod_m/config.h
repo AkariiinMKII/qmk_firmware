@@ -15,6 +15,9 @@
 #define BOOTMAGIC_ROW 0
 #define BOOTMAGIC_COLUMN 2
 
+/* The size of the EEPROM to use, in bytes. */
+#define STM32_ONBOARD_EEPROM_SIZE 65536
+
 /*
  * Feature disable options
  *  These options are also useful to firmware size reduction.
