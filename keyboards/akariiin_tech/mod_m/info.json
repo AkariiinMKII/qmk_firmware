@@ -3,7 +3,7 @@
     "keyboard_name": "MOD(el) M",
     "maintainer": "AkariiinMKII",
     "bootloader": "stm32duino",
-    "diode_direction": "ROW2COL",
+    "diode_direction": "COL2ROW",
     "features": {
         "bootmagic": true,
         "command": false,
@@ -13,8 +13,8 @@
         "nkro": false
     },
     "matrix_pins": {
-        "cols": ["B15", "B14", "B13", "B12", "A2", "A1", "A0", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "B10", "B11"],
-        "rows": ["A8", "A9", "A10", "A15", "B3", "B4", "B5", "B6"]
+        "cols": ["B6", "B5", "B4", "B3", "A15", "A10", "A9", "A8", "B15", "B14", "B13", "B12", "A2", "A1", "A0", "A3"],
+        "rows": ["B11", "B10", "B1", "B0", "A7", "A6", "A5", "A4"]
     },
     "indicators": {
         "caps_lock": "B8",
@@ -25,7 +25,7 @@
     "processor": "STM32F103",
     "url": "https://github.com/AkariiinMKII/MOD_el_m",
     "usb": {
-        "device_version": "1.0.0",
+        "device_version": "1.0.1",
         "pid": "0x0105",
         "vid": "0x9C9E"
     },
