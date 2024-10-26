@@ -1,0 +1,4 @@
+POINTING_DEVICE_ENABLE = yes
+POINTING_DEVICE_DRIVER = analog_joystick
+LTO_ENABLE = yes
+VIA_ENABLE = yes
