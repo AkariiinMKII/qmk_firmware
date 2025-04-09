@@ -1,8 +1,9 @@
 # akariiin_tech/akacube_hhkb
 
 ![akariiin_tech/akacube_hhkb](imgur.com image replace me!)
-
 *A short description of the keyboard/project*
+
+## Info
 
 * Keyboard Maintainer: [AkariiinMKII](https://github.com/AkariiinMKII)
 * Hardware Supported: *The PCBs, controllers supported*
