@@ -1,27 +1,80 @@
 {
     "manufacturer": "AkariiinTech",
     "keyboard_name": "AkaCube_HHKB",
+    "url": "",
     "maintainer": "AkariiinMKII",
+    "processor": "STM32F103",
     "bootloader": "uf2boot",
-    "diode_direction": "COL2ROW",
+    "bootmagic": {
+        "enabled": true,
+        "matrix": [0, 0]
+    },
     "features": {
-        "bootmagic": true,
         "command": false,
         "console": false,
         "extrakey": true,
         "mousekey": true,
         "nkro": true
     },
-    "matrix_pins": {
-        "cols": ["B3", "A15", "A10", "A9", "A8", "B15", "B14", "B13", "B12", "A2", "A1", "A0", "A3", "A4"],
-        "rows": ["B8", "B7", "B6", "B5", "B4"]
-    },
-    "processor": "STM32F103",
-    "url": "",
     "usb": {
         "device_version": "1.1.1",
         "pid": "0x3F54",
-        "vid": "0x9C9E"
+        "vid": "0x9C9E",
+        "max_power": 500,
+        "polling_interval": 1
+
+    },
+    "ws2812": {
+        "pin": "B11"
+    },
+    "rgblight": {
+        "led_count": 8,
+        "max_brightness": 128,
+        "brightness_steps": 16,
+        "hue_steps": 16,
+        "saturation_steps": 16,
+        "sleep": true,
+        "layers": {
+            "enabled": true,
+            "max": 8,
+            "blink": true,
+            "override_rgb": true
+
+        },
+        "animations": {
+            "alternating": true,
+            "breathing": true,
+            "christmas": true,
+            "knight": true,
+            "rainbow_mood": true,
+            "rainbow_swirl": true,
+            "snake": true,
+            "static_gradient": true,
+            "twinkle": true,
+            "rgb_test": false
+        },
+        "default": {
+            "on": true,
+            "speed": 64
+        }
+    },
+    "build": {
+        "lto": true
+    },
+    "qmk": {
+        "tap_capslock_delay": 20
+    },
+    "tapping": {
+        "permissive_hold": true
+    },
+    "dynamic_keymap": {
+        "layer_count": 5
+    },
+    "debounce": 5,
+    "diode_direction": "COL2ROW",
+    "matrix_pins": {
+        "cols": ["B3", "A15", "A10", "A9", "A8", "B15", "B14", "B13", "B12", "A2", "A1", "A0", "A3", "A4"],
+        "rows": ["B8", "B7", "B6", "B5", "B4"]
     },
     "layouts": {
         "LAYOUT_60_hhkb": {
