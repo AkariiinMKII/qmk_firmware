@@ -30,9 +30,9 @@
     "rgblight": {
         "led_count": 8,
         "max_brightness": 128,
-        "brightness_steps": 16,
-        "hue_steps": 16,
-        "saturation_steps": 16,
+        "brightness_steps": 8,
+        "hue_steps": 12,
+        "saturation_steps": 8,
         "sleep": true,
         "layers": {
             "enabled": true,
