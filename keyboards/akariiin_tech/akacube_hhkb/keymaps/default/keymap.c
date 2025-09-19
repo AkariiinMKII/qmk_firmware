@@ -4,43 +4,74 @@
 #include QMK_KEYBOARD_H
 
 // --- LED layout (0-7) ---:
-// LED 0-1 : CapsLock indicator (red)
-// LED 2-3 : Layer indicator
-// LED 4-7 : decorative RGB animations
+// LED 0-1 : CapsLock indicator (red dim)
+// LED 2-3 : ScrollLock indicator (green dim)
+// LED 4-5 : NumLock indicator (blue dim)
+// LED 6-7 : Layer indicators (cyan/yellow/purple/magenta)
 
-// Define half brightness HSV colors
-#define HSV_RED_HALF 0, 255, 128
-#define HSV_CYAN_HALF 128, 255, 128
-#define HSV_GREEN_HALF 85, 255, 128
-#define HSV_PURPLE_HALF 170, 255, 128
-#define HSV_MAGENTA_HALF 191, 255, 128
+// Define half brightness HSV colors (unused - kept for reference)
+// #define HSV_RED_HALF 0, 255, 128
+// #define HSV_ORANGE_HALF 21, 255, 128
+// #define HSV_YELLOW_HALF 43, 255, 128
+// #define HSV_CHARTREUSE_HALF 64, 255, 128
+// #define HSV_GREEN_HALF 85, 255, 128
+// #define HSV_SPRINGGREEN_HALF 106, 255, 128
+// #define HSV_CYAN_HALF 128, 255, 128
+// #define HSV_AZURE_HALF 148, 255, 128
+// #define HSV_BLUE_HALF 170, 255, 128
+// #define HSV_PURPLE_HALF 191, 255, 128
+// #define HSV_MAGENTA_HALF 213, 255, 128
+// #define HSV_PINK_HALF 234, 255, 128
+// #define HSV_WHITE_HALF 0, 0, 128
+
+// Define dimmer brightness HSV colors (val = 96)
+#define HSV_RED_DIM 0, 255, 96
+#define HSV_YELLOW_DIM 43, 255, 96
+#define HSV_GREEN_DIM 85, 255, 96
+#define HSV_CYAN_DIM 128, 255, 96
+#define HSV_BLUE_DIM 170, 255, 96
+#define HSV_PURPLE_DIM 191, 255, 96
+#define HSV_MAGENTA_DIM 213, 255, 96
 
 // CapsLock -> LED 0-1
 const rgblight_segment_t PROGMEM user_layer_caps[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 2, HSV_RED_HALF}
+    {0, 2, HSV_RED_DIM}
 );
 
-// Layer -> LED 2-3
+// Scroll Lock -> LED 2-3
+const rgblight_segment_t PROGMEM user_layer_scroll[] = RGBLIGHT_LAYER_SEGMENTS(
+    {2, 2, HSV_GREEN_DIM}
+);
+
+// Num Lock -> LED 4-5
+const rgblight_segment_t PROGMEM user_layer_num[] = RGBLIGHT_LAYER_SEGMENTS(
+    {4, 2, HSV_BLUE_DIM}
+);
+
+// Layer -> LED 6-7
 const rgblight_segment_t PROGMEM user_layer_1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {2, 2, HSV_CYAN_HALF}
+    {6, 2, HSV_CYAN_DIM}
 );
 
 const rgblight_segment_t PROGMEM user_layer_2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {2, 2, HSV_GREEN_HALF}
+    {6, 2, HSV_YELLOW_DIM}
 );
 
 const rgblight_segment_t PROGMEM user_layer_3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {2, 2, HSV_PURPLE_HALF}
+    {6, 2, HSV_PURPLE_DIM}
 );
 
 const rgblight_segment_t PROGMEM user_layer_4[] = RGBLIGHT_LAYER_SEGMENTS(
-    {2, 2, HSV_MAGENTA_HALF}
+    {6, 2, HSV_MAGENTA_DIM}
 );
 
-// Register layers.
-// Index 0 = user_layer_caps, 1 = user_layer_1, 2 = user_layer_2, etc.
+// RGB Layer Mapping:
+// Index 0 = CapsLock, 1 = ScrollLock, 2 = NumLock
+// Index 3 = Layer1, 4 = Layer2, 5 = Layer3, 6 = Layer4
 const rgblight_segment_t* const PROGMEM user_rgblight_layers[] = RGBLIGHT_LAYERS_LIST(
     user_layer_caps,
+    user_layer_scroll,
+    user_layer_num,
     user_layer_1,
     user_layer_2,
     user_layer_3,
@@ -52,19 +83,62 @@ void keyboard_post_init_user(void) {
     rgblight_layers = user_rgblight_layers;
 }
 
-// CapsLock change -> control layer index 0
+// Lock key changes -> control layer indices 0, 1, and 2
 bool led_update_user(led_t led_state) {
     rgblight_set_layer_state(0, led_state.caps_lock);
+    rgblight_set_layer_state(1, led_state.scroll_lock);
+    rgblight_set_layer_state(2, led_state.num_lock);
     return true;
 }
 
-// Layer changes -> control layer indices 1 and 2
+// Layer changes -> control RGB layer indices 3, 4, 5, and 6
 layer_state_t layer_state_set_user(layer_state_t state) {
-    rgblight_set_layer_state(1, layer_state_cmp(state, 1)); // MO(1)
-    rgblight_set_layer_state(2, layer_state_cmp(state, 2)); // MO(2)
-    rgblight_set_layer_state(3, layer_state_cmp(state, 3)); // MO(3)
-    rgblight_set_layer_state(4, layer_state_cmp(state, 4)); // MO(4)
+    rgblight_set_layer_state(3, layer_state_cmp(state, 1)); // MO(1)
+    rgblight_set_layer_state(4, layer_state_cmp(state, 2)); // MO(2)
+    rgblight_set_layer_state(5, layer_state_cmp(state, 3)); // MO(3)
+    rgblight_set_layer_state(6, layer_state_cmp(state, 4)); // MO(4)
     return state;
+}
+
+// Custom reset combo (Left Shift + Right Shift + R for 3000ms)
+// State tracking for reset combo
+static bool lshift_held = false;
+static bool rshift_held = false;
+static bool r_held = false;
+static bool combo_active = false;
+static uint16_t combo_timer = 0;
+
+// Track key presses for reset combo
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case KC_LSFT:
+            lshift_held = record->event.pressed;
+            break;
+        case KC_RSFT:
+            rshift_held = record->event.pressed;
+            break;
+        case KC_R:
+            r_held = record->event.pressed;
+            break;
+    }
+    return true; // Allow normal processing
+}
+
+// Check reset combo timing every matrix scan
+void matrix_scan_user(void) {
+    if (lshift_held && rshift_held && r_held) {
+        if (!combo_active) {
+            // First detection to start timer
+            combo_active = true;
+            combo_timer = timer_read();
+        } else if (timer_elapsed(combo_timer) >= 3000) {
+            // Hold 3000ms to enter bootloader
+            reset_keyboard();
+        }
+    } else {
+        // Reset combo on key release
+        combo_active = false;
+    }
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -93,9 +167,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
      * │Esc│F1 │F2 │F3 │F4 │F5 │F6 │F7 │F8 │F9 │F10│F11│F12│Ins│Del│
      * ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┤
-     * │Caps │Prv│Ply│Nxt│VlU│ T │ Y │ U │PSc│Scr│Pse│ ↑ │ ] │ Bspc│
+     * │Caps │Prv│Ply│Nxt│VlU│ T │ Y │Num│PSc│Scr│Pse│ ↑ │ ] │ Bspc│
      * ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤
-     * │ Ctrl │VAL│SAT│HUE│Mut│ G │ * │ / │Hom│PgU│ ← │ → │  Enter │
+     * │ Ctrl │HUE│SAT│VAL│Mut│ G │ * │ / │Hom│PgU│ ← │ → │  Enter │
      * ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────┬───┤
      * │ Shift  │RGB│NXT│SPD│VlD│ B │ + │ - │End│PgD│ ↓ │ Shift│MO1│
      * └─────┬──┴┬──┴──┬┴───┴───┴───┴───┴───┴───┴──┬┴───┴┬───┬─┴───┘
@@ -104,8 +178,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      */
     [1] = LAYOUT_hhkb(
         _______,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_INS,  KC_DEL,
-        KC_CAPS, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLU, _______, _______, _______, KC_PSCR, KC_SCRL, KC_PAUS, KC_UP,   _______, _______,
-        _______, UG_VALU, UG_SATU, UG_HUEU, KC_MUTE, _______, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT,          KC_PENT,
+        KC_CAPS, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLU, _______, _______, KC_NUM,  KC_PSCR, KC_SCRL, KC_PAUS, KC_UP,   _______, _______,
+        _______, UG_HUEU, UG_SATU, UG_VALU, KC_MUTE, _______, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT,          KC_PENT,
         _______,          UG_TOGG, UG_NEXT, UG_SPDU, KC_VOLD, _______, KC_PPLS, KC_PMNS, KC_END,  KC_PGDN, KC_DOWN, _______, _______,
                           _______, _______, _______,          _______, _______,                   _______, _______
     )
