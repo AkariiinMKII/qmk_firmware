@@ -1,5 +1,0 @@
-MOUSEKEY_ENABLE = yes
-LTO_ENABLE = yes
-RGBLIGHT_ENABLE = yes
-VIA_ENABLE = yes
-WEAR_LEVELING_DRIVER = embedded_flash
