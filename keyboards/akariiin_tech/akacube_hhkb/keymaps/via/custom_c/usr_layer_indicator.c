@@ -15,11 +15,11 @@ void layer_indicator_show(layer_state_t state) {
     bool layer3_active = layer_state_cmp(state, 3);
     bool layer4_active = layer_state_cmp(state, 4);
 
-    // Enable background if any layer is active
-    bool any_layer_is_active = (layer1_active || layer2_active || layer3_active || layer4_active);
+    // Enable background if any upper layer is active
+    bool upper_layer_active = (state > 1);
 
     // Set background first, then individual indicators
-    rgblight_set_layer_state(0, any_layer_is_active);  // Layer background
+    rgblight_set_layer_state(0, upper_layer_active);  // Layer background
     rgblight_set_layer_state(1, layer1_active);        // Layer 1
     rgblight_set_layer_state(2, layer2_active);        // Layer 2
     rgblight_set_layer_state(3, layer3_active);        // Layer 3
