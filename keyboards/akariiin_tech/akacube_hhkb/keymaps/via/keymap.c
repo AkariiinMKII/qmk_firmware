@@ -31,13 +31,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 // Process key presses for combo detection
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    return usr_combo_process(keycode, record->event.pressed);
+    return usr_combo_check(keycode, record->event.pressed);
 }
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
     lock_indicator_timer(layer_state);
-    usr_combo_resolver();
+    usr_combo_handler();
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
