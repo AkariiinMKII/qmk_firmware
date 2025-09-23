@@ -6,7 +6,6 @@
 #pragma once
 
 #include "quantum.h"
-#include "usr_config.h"
 
 // Display lock indicators with background
 void lock_indicator_show(bool num_lock, bool caps_lock, bool scroll_lock);
