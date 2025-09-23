@@ -34,6 +34,12 @@ void led_blink_hide(void);
 // Layer key behavior
 #define LAYER_KEY_SHOW_LOCK_INDICATORS  // Show locks on layer change
 
+// Maximum number of combos allowed
+#define USR_COMBO_LIMIT 2
+
+// Allow LED blink for non-combo usage (up to 32 total)
+// #define ALLOW_MORE_LED_BLINK
+
 // Combo key triggers (modifier keys only, default: LShift + RShift)
 #define USR_COMBO_MOD1 KC_LSFT
 #define USR_COMBO_MOD2 KC_RSFT
