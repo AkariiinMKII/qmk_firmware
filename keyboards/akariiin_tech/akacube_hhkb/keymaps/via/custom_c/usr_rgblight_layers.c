@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "usr_rgblight_layers.h"
-#include "usr_config.h"
 
 // RGB Layer Definitions (ordered by priority: lowest → highest)
 
@@ -54,8 +53,16 @@ static const rgblight_segment_t PROGMEM usr_layer_lockled_scroll[] = RGBLIGHT_LA
     {6, 2, USR_COLOR_LOCKLED_SCROLL}  // LEDs 6-7: Scroll lock
 );
 
+// 10-11. Blink layers (highest priority)
+static const rgblight_segment_t PROGMEM usr_layer_blink_bg[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 8, HSV_BLACK}                 // LED 0-7: Blink background
+);
+static const rgblight_segment_t PROGMEM usr_layer_blink[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 8, USR_COLOR_BLINK}           // LED 0-7: Blink color
+);
+
 // Layer mapping array
-// Priority order: layer background (lowest) → layer indicators → lock background → lock indicators (highest priority)
+// Priority order: layer background → layer indicators → lock background → lock indicators → blink layers
 const rgblight_segment_t* const PROGMEM usr_rgblight_layers[] = RGBLIGHT_LAYERS_LIST(
     usr_layer_layerled_bg,
     usr_layer_layerled_mo1,
@@ -65,7 +72,9 @@ const rgblight_segment_t* const PROGMEM usr_rgblight_layers[] = RGBLIGHT_LAYERS_
     usr_layer_lockled_bg,
     usr_layer_lockled_num,
     usr_layer_lockled_caps,
-    usr_layer_lockled_scroll
+    usr_layer_lockled_scroll,
+    usr_layer_blink_bg,
+    usr_layer_blink
 );
 
 void usr_rgblight_layers_init(void) {
@@ -85,4 +94,8 @@ void usr_rgblight_layers_init(void) {
     rgblight_set_layer_state(6, false);  // Num lock off
     rgblight_set_layer_state(7, false);  // Caps lock off
     rgblight_set_layer_state(8, false);  // Scroll lock off
+
+    // Blink layers
+    rgblight_set_layer_state(9, false);  // Blink background off
+    rgblight_set_layer_state(10, false); // Blink color off
 }

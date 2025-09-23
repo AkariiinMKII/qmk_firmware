@@ -4,11 +4,17 @@
 // VIA keymap for AkaCube HHKB keyboard
 // Features: RGB indicators for locks/layers, combo keys, VIA support
 
+// QMK framework headers
 #include QMK_KEYBOARD_H
-#include "custom_c/usr_config.h"        // Configuration constants (includes usr_rgb_colors.h)
-#include "custom_c/usr_rgblight_layers.h" // RGB light layer management
-#include "custom_c/usr_led_control.h"     // Lock/Layer LED control
-#include "custom_c/usr_combo.h"           // Combo key sequences
+
+// Project configuration
+#include "custom_c/usr_config.h"
+
+// Local modules
+#include "custom_c/usr_rgblight_layers.h"
+#include "custom_c/usr_led_control.h"
+#include "custom_c/usr_led_blink.h"
+#include "custom_c/usr_combo.h"
 
 // QMK callback functions
 
@@ -38,6 +44,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 void matrix_scan_user(void) {
     lock_indicator_timer(layer_state);
     usr_combo_handler();
+    led_blink_timer();
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
