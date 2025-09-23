@@ -7,6 +7,7 @@
 
 #include "quantum.h"
 #include "usr_config.h"
+#include "usr_led_blink.h"
 
 // Configuration fallbacks
 #ifndef USR_COMBO_MOD1

@@ -8,11 +8,14 @@ typedef struct {
     uint16_t key;
     uint16_t hold_time;
     void (*action)(void);
+    void (*on_satisfied)(void);  // Called when combo becomes satisfied (optional)
+    void (*on_reset)(void);      // Called when combo is reset (optional)
 } combo_config_t;
 
 typedef struct {
-    bool key_held;
-    uint16_t timer;  // 0 = timer not started, >0 = timer start timestamp
+    bool key_held;   // Physical combo key is held
+    bool satisfied;  // Combo is satisfied (for callbacks and timing)
+    uint16_t timer;  // Timestamp when combo became satisfied
 } combo_state_t;
 
 // Static data
@@ -28,8 +31,11 @@ static bool combo_ready(void) { return mod1_held && mod2_held; }
 
 static void combo_reset(void) {
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
+        if (combo_states[i].satisfied && combos[i].on_reset) {
+            combos[i].on_reset();
+        }
         combo_states[i].key_held = false;
-        combo_states[i].timer = 0;
+        combo_states[i].satisfied = false;
     }
 }
 
@@ -46,17 +52,11 @@ static void usr_combo_timer(uint8_t combo_index) {
     const combo_config_t *config = &combos[combo_index];
     combo_state_t *state = &combo_states[combo_index];
 
-    if (combo_ready() && state->key_held) {
-        if (state->timer == 0) {
-            state->timer = timer_read();
-            if (state->timer == 0) { state->timer = 1; }  // Avoid timer_read() == 0 edge case
-        } else if (timer_elapsed(state->timer) >= config->hold_time) {
+    if (state->satisfied) {
+        if (timer_elapsed(state->timer) >= config->hold_time) {
             config->action();
-            state->timer = 0;
+            state->satisfied = false;  // Mark as completed to stop repeated actions
         }
-    } else {
-        // Reset current timer if combo pressing suspended
-        state->timer = 0;
     }
 }
 
@@ -78,10 +78,26 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
     // Handle combo action keys
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         if (keycode == combos[i].key) {
+            bool was_satisfied = combo_states[i].satisfied;
+
             if (pressed && combo_ready()) {
                 combo_states[i].key_held = true;
+                // Check if this combo just became satisfied
+                if (!was_satisfied) {
+                    combo_states[i].satisfied = true;
+                    combo_states[i].timer = timer_read();  // Start timing immediately
+                    if (combos[i].on_satisfied) {
+                        combos[i].on_satisfied();  // Call on_satisfied callback
+                    }
+                }
             } else if (!pressed) {
                 combo_states[i].key_held = false;
+                if (was_satisfied) {
+                    combo_states[i].satisfied = false;
+                    if (combos[i].on_reset) {
+                        combos[i].on_reset();  // Call on_reset callback
+                    }
+                }
             }
 
             // Suppress if combo is active now, or if it just became active
