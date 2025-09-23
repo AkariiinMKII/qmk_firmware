@@ -40,16 +40,8 @@ static void combo_reset(void) {
         }
         combo_states[i].key_held = false;
         combo_states[i].satisfied = false;
+        combo_states[i].timer = 0;  // Reset timer
     }
-}
-
-static bool combo_satisfied(void) {
-    if (!combo_ready()) { return false; }
-
-    for (uint8_t i = 0; i < NUM_COMBOS; i++) {
-        if (combo_states[i].key_held) { return true; }
-    }
-    return false;
 }
 
 static void usr_combo_timer(uint8_t combo_index) {
@@ -60,6 +52,7 @@ static void usr_combo_timer(uint8_t combo_index) {
         if (timer_elapsed(state->timer) >= config->hold_time) {
             config->action();
             state->satisfied = false;  // Mark as completed to stop repeated actions
+            state->timer = 0;         // Reset timer
         }
     }
 }
@@ -70,13 +63,11 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
     if (keycode == USR_COMBO_MOD1) {
         mod1_held = pressed;
         if (!pressed) { combo_reset(); }
-        // Suppress modifier presses when any combo is already active
-        return !(pressed && combo_satisfied());
+        return true;  // Always allow modifier keys through
     } else if (keycode == USR_COMBO_MOD2) {
         mod2_held = pressed;
         if (!pressed) { combo_reset(); }
-        // Suppress modifier presses when any combo is already active
-        return !(pressed && combo_satisfied());
+        return true;  // Always allow modifier keys through
     }
 
     // Handle combo action keys
@@ -84,33 +75,36 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
         if (keycode == combos[i].key) {
             bool was_satisfied = combo_states[i].satisfied;
 
-            if (pressed && combo_ready()) {
+            if (pressed) {
                 combo_states[i].key_held = true;
-                // Check if this combo just became satisfied
-                if (!was_satisfied) {
-                    combo_states[i].satisfied = true;
-                    combo_states[i].timer = timer_read();  // Start timing immediately
-                    if (combos[i].on_satisfied) {
-                        combos[i].on_satisfied();  // Call on_satisfied callback
+                if (combo_ready()) {
+                    // Check if this combo just became satisfied
+                    if (!was_satisfied) {
+                        combo_states[i].satisfied = true;
+                        combo_states[i].timer = timer_read();
+                        if (combos[i].on_satisfied) {
+                            combos[i].on_satisfied();
+                        }
                     }
+                    return false;  // Suppress key when combo becomes satisfied or already satisfied
+                } else {
+                    return true;   // Key pressed but combo not ready, allow it through
                 }
-            } else if (!pressed) {
+            } else {
                 combo_states[i].key_held = false;
                 if (was_satisfied) {
                     combo_states[i].satisfied = false;
+                    combo_states[i].timer = 0;
                     if (combos[i].on_reset) {
-                        combos[i].on_reset();  // Call on_reset callback
+                        combos[i].on_reset();
                     }
                 }
+                return true;  // Always allow key release
             }
-
-            // Suppress if combo is active now, or if it just became active
-            return !(combo_satisfied() || (pressed && combo_ready()));
         }
     }
 
-    // Not a combo-related key
-    return true;
+    return true;  // Not a combo-related key, allow it through
 }
 
 void usr_combo_handler(void) {
