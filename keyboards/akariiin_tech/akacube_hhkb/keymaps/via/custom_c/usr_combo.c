@@ -24,7 +24,11 @@ static combo_state_t combo_states[sizeof(combos) / sizeof(combos[0])] = {0};
 static bool mod1_held = false;
 static bool mod2_held = false;
 
+// Macros
 #define NUM_COMBOS (sizeof(combos) / sizeof(combos[0]))
+
+// Compile-time check
+_Static_assert(NUM_COMBOS <= USR_COMBO_LIMIT, "Too many combo definitions");
 
 // Static functions
 static bool combo_ready(void) { return mod1_held && mod2_held; }
