@@ -18,7 +18,11 @@ static struct {
 
 // Show LED blink effect on LEDs 0-7
 static void check_ref_count(void) {
-    if (blink_state.ref_count >= 16) {
+#ifdef ALLOW_MORE_LED_BLINK
+    if (blink_state.ref_count >= 32) {
+#else
+    if (blink_state.ref_count >= USR_COMBO_LIMIT) {
+#endif
         // Abnormal value detected - force reset
         blink_state.active = false;
         blink_state.led_on = false;
