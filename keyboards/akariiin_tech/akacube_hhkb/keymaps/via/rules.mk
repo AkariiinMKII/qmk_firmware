@@ -16,7 +16,8 @@ WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling
 
 # ------------------ User Space Source Files ------------------
 SRC += custom_c/usr_rgblight_layers.c # RGB light layer management
+SRC += custom_c/usr_led_control.c     # LED control coordination
 SRC += custom_c/usr_layer_indicator.c # Layer indicator system library
 SRC += custom_c/usr_lock_indicator.c  # Lock indicator system library
-SRC += custom_c/usr_led_control.c     # LED control coordination
+SRC += custom_c/usr_led_blink.c       # LED blink effects
 SRC += custom_c/usr_combo.c           # Combo key sequences
