@@ -6,7 +6,6 @@
 #include "quantum.h"
 #include "usr_config.h"
 
-// Fallback RGB color values
 #ifndef USR_COLOR_LAYERLED_BG
 #    define USR_COLOR_LAYERLED_BG     HSV_RED_DIM
 #endif
@@ -25,14 +24,14 @@
 #ifndef USR_COLOR_LOCKLED_BG
 #    define USR_COLOR_LOCKLED_BG      HSV_RED_DIM
 #endif
-#ifndef USR_COLOR_LOCKLED_NUM
-#    define USR_COLOR_LOCKLED_NUM     HSV_GREEN_DIM
+#ifndef USR_COLOR_LOCKLED_1
+#    define USR_COLOR_LOCKLED_1       HSV_GREEN_DIM
 #endif
-#ifndef USR_COLOR_LOCKLED_CAPS
-#    define USR_COLOR_LOCKLED_CAPS    HSV_GREEN_DIM
+#ifndef USR_COLOR_LOCKLED_2
+#    define USR_COLOR_LOCKLED_2       HSV_GREEN_DIM
 #endif
-#ifndef USR_COLOR_LOCKLED_SCROLL
-#    define USR_COLOR_LOCKLED_SCROLL  HSV_GREEN_DIM
+#ifndef USR_COLOR_LOCKLED_3
+#    define USR_COLOR_LOCKLED_3       HSV_GREEN_DIM
 #endif
 #ifndef USR_COLOR_BLINK
 #    define USR_COLOR_BLINK           HSV_RED_DIM

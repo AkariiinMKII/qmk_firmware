@@ -6,7 +6,6 @@
 #include "quantum.h"
 #include "usr_config.h"
 
-// Fallback values for blink timing
 #ifndef USR_BLINK_TIME_ON
 #    define USR_BLINK_TIME_ON 300
 #endif

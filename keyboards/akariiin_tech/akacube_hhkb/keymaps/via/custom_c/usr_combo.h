@@ -7,7 +7,6 @@
 #include "usr_config.h"
 #include "usr_led_blink.h"
 
-// Configuration fallbacks
 #ifndef USR_COMBO_MOD1
 #    define USR_COMBO_MOD1 KC_LSFT
 #endif
