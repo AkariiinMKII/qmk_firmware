@@ -66,6 +66,8 @@ static inline bool combo_satisfied_get(uint8_t combo_index) {
 }
 
 static void combo_reset(void) {
+    if (!combo_satisfied_state) return;
+
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         if (combo_satisfied_get(i)) {
             combo_satisfied_set(i, false);
@@ -78,15 +80,16 @@ static void combo_reset(void) {
 }
 
 static void usr_combo_timer(uint8_t combo_index) {
+    if (!combo_satisfied_get(combo_index)) return;
+
     const combo_config_t *config = &combos[combo_index];
     combo_state_t *state = &combo_states[combo_index];
 
-    if (combo_satisfied_get(combo_index)) {
-        if (timer_elapsed(state->timer) >= config->hold_time) {
-            combo_satisfied_set(combo_index, false);  // Mark as completed to prevent repeated executions
-            state->timer = 0;
-            config->on_complete();
-        }
+    if (timer_elapsed(state->timer) >= config->hold_time) {
+        combo_satisfied_set(combo_index, false);  // Mark as completed to prevent repeated executions
+        state->timer = 0;
+
+        config->on_complete();
     }
 }
 
@@ -114,6 +117,11 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
                     if (!was_satisfied) {
                         combo_satisfied_set(i, true); // Mark as satisfied on key press
                         combo_states[i].timer = timer_read();
+
+                        // Unregister modifier keys when combo becomes satisfied
+                        unregister_code(USR_COMBO_MOD1);
+                        unregister_code(USR_COMBO_MOD2);
+
                         if (combos[i].on_satisfied) {
                             combos[i].on_satisfied();
                         }
@@ -140,6 +148,8 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
 }
 
 void usr_combo_handler(void) {
+    if (!usr_combo_any_active()) return;
+
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         usr_combo_timer(i);
     }
