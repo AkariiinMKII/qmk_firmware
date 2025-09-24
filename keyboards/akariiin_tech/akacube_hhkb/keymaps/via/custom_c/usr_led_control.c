@@ -5,10 +5,6 @@
 #include "usr_layer_indicator.h"
 #include "usr_lock_indicator.h"
 
-// ============================================================================
-// LED CONTROL - COORDINATES LOCK AND LAYER INDICATORS
-// ============================================================================
-
 // Lock state management - moved from usr_lock_indicator.c
 static struct {
     bool num_lock;
