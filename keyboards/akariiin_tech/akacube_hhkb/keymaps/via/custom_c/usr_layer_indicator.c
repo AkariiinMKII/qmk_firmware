@@ -3,10 +3,6 @@
 
 #include "usr_layer_indicator.h"
 
-// ============================================================================
-// LAYER INDICATOR DISPLAY FUNCTIONS
-// ============================================================================
-
 // Show layer LEDs with optimized caching
 void layer_indicator_show(layer_state_t state) {
     // Cache layer states first for efficiency

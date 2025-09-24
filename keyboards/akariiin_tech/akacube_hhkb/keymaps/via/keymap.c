@@ -1,22 +1,13 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// VIA keymap for AkaCube HHKB keyboard
-// Features: RGB indicators for locks/layers, combo keys, VIA support
-
-// QMK framework headers
 #include QMK_KEYBOARD_H
 
-// Project configuration
 #include "custom_c/usr_config.h"
-
-// Local modules
 #include "custom_c/usr_rgblight_layers.h"
 #include "custom_c/usr_led_control.h"
 #include "custom_c/usr_led_blink.h"
 #include "custom_c/usr_combo.h"
-
-// QMK callback functions
 
 // Initialize RGB layers on startup
 void keyboard_post_init_user(void) {

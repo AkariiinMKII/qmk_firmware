@@ -7,14 +7,12 @@
 typedef struct {
     uint16_t key;
     uint16_t hold_time;
-    void (*action)(void);
+    void (*on_complete)(void);
     void (*on_satisfied)(void);  // Called when combo becomes satisfied (optional)
     void (*on_reset)(void);      // Called when combo is reset (optional)
 } combo_config_t;
 
 typedef struct {
-    bool key_held;   // Physical combo key is held
-    bool satisfied;  // Combo is satisfied (for callbacks and timing)
     uint16_t timer;  // Timestamp when combo became satisfied
 } combo_state_t;
 
@@ -23,24 +21,59 @@ static const combo_config_t combos[] = { USR_COMBO_DEFINITIONS };
 static combo_state_t combo_states[sizeof(combos) / sizeof(combos[0])] = {0};
 static bool mod1_held = false;
 static bool mod2_held = false;
+#ifdef USR_COMBO_ALLOW_OVER16
+static uint32_t combo_satisfied_state = 0;  // Bitmask: bit N = combo N satisfied (up to 32 combos)
+#else
+static uint16_t combo_satisfied_state = 0;  // Bitmask: bit N = combo N satisfied (up to 16 combos)
+#endif
 
 // Macros
 #define NUM_COMBOS (sizeof(combos) / sizeof(combos[0]))
 
-// Compile-time check
-_Static_assert(NUM_COMBOS <= USR_COMBO_LIMIT, "Too many combo definitions");
+// Compile-time checks for combo limits
+#ifdef USR_COMBO_ALLOW_OVER16
+_Static_assert(NUM_COMBOS <= 32, "Too many combo definitions for uint32_t bitmask (max 32)");
+#else
+_Static_assert(NUM_COMBOS <= 16, "Too many combo definitions for uint16_t bitmask (max 16, or define USR_COMBO_ALLOW_OVER16)");
+#endif
 
 // Static functions
-static bool combo_ready(void) { return mod1_held && mod2_held; }
+static bool combo_ready(void) { return mod1_held && mod2_held; } // Mark as ready when both mods held
+
+// Bitmask operations for combo satisfied states (like QMK layer system)
+static inline void combo_satisfied_set(uint8_t combo_index, bool satisfied) {
+#ifdef USR_COMBO_ALLOW_OVER16
+    if (satisfied) {
+        combo_satisfied_state |= (1UL << combo_index);
+    } else {
+        combo_satisfied_state &= ~(1UL << combo_index);
+    }
+#else
+    if (satisfied) {
+        combo_satisfied_state |= (1U << combo_index);
+    } else {
+        combo_satisfied_state &= ~(1U << combo_index);
+    }
+#endif
+}
+
+static inline bool combo_satisfied_get(uint8_t combo_index) {
+#ifdef USR_COMBO_ALLOW_OVER16
+    return combo_satisfied_state & (1UL << combo_index);
+#else
+    return combo_satisfied_state & (1U << combo_index);
+#endif
+}
 
 static void combo_reset(void) {
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
-        if (combo_states[i].satisfied && combos[i].on_reset) {
-            combos[i].on_reset();
+        if (combo_satisfied_get(i)) {
+            combo_satisfied_set(i, false);
+            combo_states[i].timer = 0;
+            if (combos[i].on_reset) {
+                combos[i].on_reset();
+            }
         }
-        combo_states[i].key_held = false;
-        combo_states[i].satisfied = false;
-        combo_states[i].timer = 0;  // Reset timer
     }
 }
 
@@ -48,11 +81,11 @@ static void usr_combo_timer(uint8_t combo_index) {
     const combo_config_t *config = &combos[combo_index];
     combo_state_t *state = &combo_states[combo_index];
 
-    if (state->satisfied) {
+    if (combo_satisfied_get(combo_index)) {
         if (timer_elapsed(state->timer) >= config->hold_time) {
-            config->action();
-            state->satisfied = false;  // Mark as completed to stop repeated actions
-            state->timer = 0;         // Reset timer
+            combo_satisfied_set(combo_index, false);  // Mark as completed to prevent repeated executions
+            state->timer = 0;
+            config->on_complete();
         }
     }
 }
@@ -62,38 +95,36 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
     // Handle modifier keys
     if (keycode == USR_COMBO_MOD1) {
         mod1_held = pressed;
-        if (!pressed) { combo_reset(); }
+        if (!pressed) { combo_reset(); }  // Mark as not satisfied on any mod release
         return true;  // Always allow modifier keys through
     } else if (keycode == USR_COMBO_MOD2) {
         mod2_held = pressed;
-        if (!pressed) { combo_reset(); }
+        if (!pressed) { combo_reset(); }  // Mark as not satisfied on any mod release
         return true;  // Always allow modifier keys through
     }
 
-    // Handle combo action keys
+    // Handle combo trigger keys
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         if (keycode == combos[i].key) {
-            bool was_satisfied = combo_states[i].satisfied;
+            bool was_satisfied = combo_satisfied_get(i);
 
             if (pressed) {
-                combo_states[i].key_held = true;
                 if (combo_ready()) {
-                    // Check if this combo just became satisfied
+                    // Check if this combo newly becomes satisfied
                     if (!was_satisfied) {
-                        combo_states[i].satisfied = true;
+                        combo_satisfied_set(i, true); // Mark as satisfied on key press
                         combo_states[i].timer = timer_read();
                         if (combos[i].on_satisfied) {
                             combos[i].on_satisfied();
                         }
                     }
-                    return false;  // Suppress key when combo becomes satisfied or already satisfied
+                    return false;  // Catch the key and suppress on satisfied or already satisfied
                 } else {
-                    return true;   // Key pressed but combo not ready, allow it through
+                    return true;   // Allow key through if combo not ready
                 }
             } else {
-                combo_states[i].key_held = false;
                 if (was_satisfied) {
-                    combo_states[i].satisfied = false;
+                    combo_satisfied_set(i, false); // Mark as not satisfied on key release
                     combo_states[i].timer = 0;
                     if (combos[i].on_reset) {
                         combos[i].on_reset();
@@ -104,11 +135,17 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
         }
     }
 
-    return true;  // Not a combo-related key, allow it through
+    // If we reach here, it's neither a modifier nor a combo key
+    return true;  // Allow non-combo-related keys through
 }
 
 void usr_combo_handler(void) {
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         usr_combo_timer(i);
     }
+}
+
+// Public function to check if any combo is currently satisfied
+bool usr_combo_any_active(void) {
+    return combo_satisfied_state != 0;
 }

@@ -3,41 +3,15 @@
 
 #include "usr_led_blink.h"
 
-// ============================================================================
-// LED BLINK CONTROL FUNCTIONS
-// ============================================================================
-
 // Blink state management
 static struct {
     bool active;        // Blink active
     bool led_on;        // LED state
     uint16_t timer;     // Timer
-    uint8_t ref_count;  // Reference count for multiple combos
-} blink_state = {false, false, 0, 0};
-
-
-// Show LED blink effect on LEDs 0-7
-static void check_ref_count(void) {
-#ifdef ALLOW_MORE_LED_BLINK
-    if (blink_state.ref_count > 32) {
-#else
-    if (blink_state.ref_count > USR_COMBO_LIMIT) {
-#endif
-        // Abnormal value detected - force reset
-        blink_state.active = false;
-        blink_state.led_on = false;
-        blink_state.timer = 0;
-        blink_state.ref_count = 0;
-        rgblight_set_layer_state(9, false);
-        rgblight_set_layer_state(10, false);
-    }
-}
+} blink_state = {false, false, 0};
 
 // Show LED blink effect on LEDs 0-7
 void led_blink_show(void) {
-    check_ref_count();
-    blink_state.ref_count++;
-
     if (!blink_state.active) {
         blink_state.active = true;
         blink_state.led_on = true;
@@ -50,13 +24,7 @@ void led_blink_show(void) {
 
 // Hide LED blink effect
 void led_blink_hide(void) {
-    check_ref_count();
-
-    if (blink_state.ref_count > 0) {
-        blink_state.ref_count--;
-    }
-
-    if (blink_state.ref_count == 0) {
+    if (blink_state.active) {
         blink_state.active = false;
         blink_state.led_on = false;
         blink_state.timer = 0;
@@ -68,8 +36,6 @@ void led_blink_hide(void) {
 
 // Handle blink timing
 void led_blink_timer(void) {
-    check_ref_count();
-
     if (!blink_state.active) return;
 
     uint16_t elapsed = timer_elapsed(blink_state.timer);
