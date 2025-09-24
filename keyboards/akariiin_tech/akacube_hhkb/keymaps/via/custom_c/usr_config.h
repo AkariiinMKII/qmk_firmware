@@ -41,11 +41,13 @@ bool usr_combo_any_active(void);
 // #define USR_COMBO_ALLOW_OVER16
 
 // Combo key triggers (modifier keys only, default: LShift + RShift)
+// Note: Modifier keys are automatically unregistered when combos become satisfied
 #define USR_COMBO_MOD1 KC_LSFT
 #define USR_COMBO_MOD2 KC_RSFT
 
 // Internal combo definitions
-// Format: {.key = COMBO_KEY, .hold_time = HOLD_TIME, .on_complete = action on completed, .on_satisfied = action on pressed (optional), .on_reset = action on reset (optional)}
+// Format: {.key = COMBO_KEY, .hold_time = HOLD_TIME, .on_complete = action, .on_satisfied = action (optional), .on_reset = action (optional)}
+// Note: Combo keys are suppressed if mod keys ready; released on key up or timeout
 #define USR_COMBO_DEFINITIONS \
     {.key = USR_RESET_COMBO_KEY, .hold_time = USR_RESET_COMBO_TIME, .on_complete = usr_reset_combo_on_complete, .on_satisfied = usr_reset_combo_on_satisfied, .on_reset = usr_reset_combo_on_reset}, \
     {.key = USR_CIALLO_COMBO_KEY, .hold_time = USR_CIALLO_COMBO_TIME, .on_complete = usr_ciallo_combo_on_complete, .on_satisfied = usr_ciallo_combo_on_satisfied, .on_reset = usr_ciallo_combo_on_reset}
