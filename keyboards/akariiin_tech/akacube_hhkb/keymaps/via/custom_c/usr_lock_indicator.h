@@ -5,5 +5,5 @@
 
 #include "quantum.h"
 
-void lock_indicator_show(bool num_lock, bool caps_lock, bool scroll_lock);
+void lock_indicator_show(uint8_t lock_state);
 void lock_indicator_hide(void);

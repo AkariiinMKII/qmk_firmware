@@ -14,11 +14,13 @@ void keyboard_post_init_user(void) {
     usr_rgblight_layers_init();
 }
 
-// Update RGB indicators when lock states change (Caps/Num/Scroll)
+// Update RGB indicators when lock states change
+#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
 bool led_update_user(led_t led_state) {
     lock_indicator_update(led_state);
     return true;
 }
+#endif
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
@@ -33,7 +35,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
+#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
     lock_indicator_timer(layer_state);
+#endif
     usr_combo_handler();
     led_blink_timer();
 }

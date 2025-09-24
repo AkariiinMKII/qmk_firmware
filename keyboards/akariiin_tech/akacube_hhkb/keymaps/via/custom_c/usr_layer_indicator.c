@@ -3,21 +3,11 @@
 
 #include "usr_layer_indicator.h"
 
-// Show layer LEDs with optimized caching
+// Show layer indicators with bit checks
 void layer_indicator_show(layer_state_t state) {
-    // Cache layer states first for efficiency
-    bool layer1_active = layer_state_cmp(state, 1);
-    bool layer2_active = layer_state_cmp(state, 2);
-    bool layer3_active = layer_state_cmp(state, 3);
-    bool layer4_active = layer_state_cmp(state, 4);
-
-    // Enable background if any upper layer is active
-    bool upper_layer_active = (state > 1);
-
-    // Set background first, then individual indicators
-    rgblight_set_layer_state(0, upper_layer_active);  // Layer background
-    rgblight_set_layer_state(1, layer1_active);        // Layer 1
-    rgblight_set_layer_state(2, layer2_active);        // Layer 2
-    rgblight_set_layer_state(3, layer3_active);        // Layer 3
-    rgblight_set_layer_state(4, layer4_active);        // Layer 4
+    rgblight_set_layer_state(0, state > 1);         // Background
+    rgblight_set_layer_state(1, (state & 2) > 0);   // Layer 1
+    rgblight_set_layer_state(2, (state & 4) > 0);   // Layer 2
+    rgblight_set_layer_state(3, (state & 8) > 0);   // Layer 3
+    rgblight_set_layer_state(4, (state & 16) > 0);  // Layer 4
 }
