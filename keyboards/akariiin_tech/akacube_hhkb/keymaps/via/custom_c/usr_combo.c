@@ -12,13 +12,8 @@ typedef struct {
     void (*on_reset)(void);      // Called when combo is reset (optional)
 } combo_config_t;
 
-typedef struct {
-    uint16_t timer;  // Timestamp when combo became satisfied
-} combo_state_t;
-
 // Static data
 static const combo_config_t combos[] = { USR_COMBO_DEFINITIONS };
-static combo_state_t combo_states[sizeof(combos) / sizeof(combos[0])] = {0};
 static bool mod1_held = false;
 static bool mod2_held = false;
 #ifdef USR_COMBO_ALLOW_OVER16
@@ -26,6 +21,7 @@ static uint32_t combo_satisfied_state = 0;  // Bitmask: bit N = combo N satisfie
 #else
 static uint16_t combo_satisfied_state = 0;  // Bitmask: bit N = combo N satisfied (up to 16 combos)
 #endif
+static uint16_t combo_timers[sizeof(combos) / sizeof(combos[0])] = {0};
 
 // Macros
 #define NUM_COMBOS (sizeof(combos) / sizeof(combos[0]))
@@ -71,7 +67,7 @@ static void combo_reset(void) {
     for (uint8_t i = 0; i < NUM_COMBOS; i++) {
         if (combo_satisfied_get(i)) {
             combo_satisfied_set(i, false);
-            combo_states[i].timer = 0;
+            combo_timers[i] = 0;
             if (combos[i].on_reset) {
                 combos[i].on_reset();
             }
@@ -83,11 +79,10 @@ static void usr_combo_timer(uint8_t combo_index) {
     if (!combo_satisfied_get(combo_index)) return;
 
     const combo_config_t *config = &combos[combo_index];
-    combo_state_t *state = &combo_states[combo_index];
 
-    if (timer_elapsed(state->timer) >= config->hold_time) {
+    if (timer_elapsed(combo_timers[combo_index]) >= config->hold_time) {
         combo_satisfied_set(combo_index, false);  // Mark as completed to prevent repeated executions
-        state->timer = 0;
+        combo_timers[combo_index] = 0;
 
         config->on_complete();
     }
@@ -116,7 +111,7 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
                     // Check if this combo newly becomes satisfied
                     if (!was_satisfied) {
                         combo_satisfied_set(i, true); // Mark as satisfied on key press
-                        combo_states[i].timer = timer_read();
+                        combo_timers[i] = timer_read();
 
                         // Unregister modifier keys when combo becomes satisfied
                         unregister_code(USR_COMBO_MOD1);
@@ -133,7 +128,7 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
             } else {
                 if (was_satisfied) {
                     combo_satisfied_set(i, false); // Mark as not satisfied on key release
-                    combo_states[i].timer = 0;
+                    combo_timers[i] = 0;
                     if (combos[i].on_reset) {
                         combos[i].on_reset();
                     }
