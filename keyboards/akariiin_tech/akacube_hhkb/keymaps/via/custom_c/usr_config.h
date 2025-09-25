@@ -1,7 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// User configuration for VIA keymap
+// User configuration for custom features
 
 #pragma once
 
@@ -36,38 +36,46 @@ bool usr_combo_any_active(void);
 // Note: Due to API limitations, lock indicators may not work properly on some operating systems
 
 // Lock LED mapping configuration
-// Positions: LOCKLED_1=LED 0-1 (left), LOCKLED_2=LED 3-4 (middle), LOCKLED_3=LED 6-7 (right)
-// Available values: num_lock, caps_lock, scroll_lock, compose, kana, disable
-// Note: Setting all LOCKLEDs to 'disable' will disable the entire lock indicator system and forcely enable layer indicators
+// - Positions: USR_LOCKLED_1=LED 0-1 (left), USR_LOCKLED_2=LED 3-4 (middle), USR_LOCKLED_3=LED 6-7 (right)
+// - Available values: num_lock, caps_lock, scroll_lock, compose, kana, disable
+// - Setting all LOCKLEDs to 'disable' will disable the entire lock indicator system and force enable layer indicators
 #define USR_LOCKLED_1 num_lock
 #define USR_LOCKLED_2 caps_lock
 #define USR_LOCKLED_3 scroll_lock
 
 // Lock LED timeout
-#define USR_LOCKLED_KEEPTIME 1000  // Lock LED keep time (ms)
+// - Time to keep lock indicators on after lock state changes (ms)
+#define USR_LOCKLED_KEEPTIME 1000
 
 // Layer key behavior
-#define LAYER_KEY_SHOW_LOCK_INDICATORS  // Show locks on layer change
+// - Uncomment to show lock indicators when layer keys pressed down
+// - This will disable layer indicators unless all lock indicators are disabled
+#define LAYER_KEY_SHOW_LOCK_INDICATORS
 
 
 // ================== LED BLINK SYSTEM ==================
 
-#define USR_BLINK_TIME_ON   200    // Blink on time (ms)
-#define USR_BLINK_TIME_IDLE 200    // Blink idle time (ms)
+// Blink effect configuration
+// - Time of LED on and off in a blink cycle (ms)
+#define USR_BLINK_TIME_ON   200    // Blink on time
+#define USR_BLINK_TIME_IDLE 200    // Blink off time
 
 
 // ================== COMBO SYSTEM ==================
 
-// Combo configuration:
-// - Default: uint16_t bitmask supports up to 16 combos (better performance)
-// - Define USR_COMBO_ALLOW_OVER16 to use uint32_t bitmask for up to 32 combos
+// Combo configuration
+// - Support up to 16 combos by default (better performance)
+// - Uncomment to enable support for up to 32 combos
 // #define USR_COMBO_ALLOW_OVER16
 
-// Combo key triggers (modifier keys only, default: LShift + RShift)
-// Note: Modifier keys are automatically unregistered when combos become satisfied
+// Combo triggers
+// - Only support modifier keys, default: LShift + RShift
+// - These modifier keys must be held down before pressing combo key
+// - Modifier keys are automatically unregistered when combos being satisfied
 #define USR_COMBO_MOD1 KC_LSFT
 #define USR_COMBO_MOD2 KC_RSFT
 
+// Combo set definitions
 // Reset combo configuration
 #define USR_RESET_COMBO_KEY KC_R          // Change reset key
 #define USR_RESET_COMBO_TIME 5000         // Change reset timing
@@ -105,9 +113,13 @@ static inline void usr_ciallo_combo_on_reset(void) {
     }
 }
 
-// Internal combo definitions - defined AFTER all symbols above
-// Format: {.key = COMBO_KEY, .hold_time = HOLD_TIME, .on_complete = action, .on_satisfied = action (optional), .on_reset = action (optional)}
-// Note: Combo keys are suppressed if mod keys ready; released on key up or timeout
+// Internal combo definitions
+// - Define combo configurations above then add them here, optional items can be omitted
+// - Format: {.key = COMBO_KEY, .hold_time = HOLD_TIME, .on_complete = action, .on_satisfied = action (optional), .on_reset = action (optional)}
+// - Combo keys will be suppressed if modifier keys are held
+// - On_complete: called when combo being completed (all keys held for required time after being satisfied)
+// - On_satisfied (optional): called when combo being satisfied (modifier and combo keys pressed in required sequence)
+// - On_reset (optional): called when combo being reset (any modifier or combo key released after satisfaction and before completion)
 #define USR_COMBO_DEFINITIONS \
     {.key = USR_RESET_COMBO_KEY, .hold_time = USR_RESET_COMBO_TIME, .on_complete = usr_reset_combo_on_complete, .on_satisfied = usr_reset_combo_on_satisfied, .on_reset = usr_reset_combo_on_reset}, \
     {.key = USR_CIALLO_COMBO_KEY, .hold_time = USR_CIALLO_COMBO_TIME, .on_complete = usr_ciallo_combo_on_complete, .on_satisfied = usr_ciallo_combo_on_satisfied, .on_reset = usr_ciallo_combo_on_reset}
