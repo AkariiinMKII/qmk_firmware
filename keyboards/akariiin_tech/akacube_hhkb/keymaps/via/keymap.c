@@ -8,19 +8,19 @@
 #include "custom_c/usr_led_control.h"
 #include "custom_c/usr_led_blink.h"
 #include "custom_c/usr_combo.h"
+#include "custom_c/usr_via_config.h"
 
-// Initialize RGB layers on startup
+// Initialize RGB layers and VIA configuration on startup
 void keyboard_post_init_user(void) {
+    usr_via_config_init();
     usr_rgblight_layers_init();
 }
 
 // Update RGB indicators when lock states change
-#ifdef LOCKLED_SYSTEM_ENABLE
 bool led_update_user(led_t led_state) {
     lock_indicator_update(led_state);
     return true;
 }
-#endif
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
@@ -35,9 +35,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-#ifdef LOCKLED_SYSTEM_ENABLE
     lock_indicator_timer(layer_state);
-#endif
     usr_combo_handler();
     led_blink_timer();
 }

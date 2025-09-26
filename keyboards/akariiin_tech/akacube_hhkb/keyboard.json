@@ -36,10 +36,9 @@
         "sleep": true,
         "layers": {
             "enabled": true,
-            "max": 12,
+            "max": 16,
             "blink": true,
             "override_rgb": true
-
         },
         "animations": {
             "alternating": true,
@@ -76,6 +75,63 @@
         "cols": ["B3", "A15", "A10", "A9", "A8", "B15", "B14", "B13", "B12", "A2", "A1", "A0", "A3", "A4"],
         "rows": ["B8", "B7", "B6", "B5", "B4"]
     },
+    "customMenus": [
+        {
+            "label": "RGB Indicators",
+            "content": [
+                {
+                    "label": "Indicator 1",
+                    "type": "dropdown",
+                    "options": [
+                        ["Disabled", 0],
+                        ["Num Lock", 1],
+                        ["Caps Lock", 2],
+                        ["Scroll Lock", 4],
+                        ["Compose", 8],
+                        ["Kana", 16]
+                    ],
+                    "content": ["0", "0", "0"]
+                },
+                {
+                    "label": "Indicator 2",
+                    "type": "dropdown",
+                    "options": [
+                        ["Disabled", 0],
+                        ["Num Lock", 1],
+                        ["Caps Lock", 2],
+                        ["Scroll Lock", 4],
+                        ["Compose", 8],
+                        ["Kana", 16]
+                    ],
+                    "content": ["0", "1", "0"]
+                },
+                {
+                    "label": "Indicator 3",
+                    "type": "dropdown",
+                    "options": [
+                        ["Disabled", 0],
+                        ["Num Lock", 1],
+                        ["Caps Lock", 2],
+                        ["Scroll Lock", 4],
+                        ["Compose", 8],
+                        ["Kana", 16]
+                    ],
+                    "content": ["0", "2", "0"]
+                },
+                {
+                    "label": "Indicator Timeout (100-10000ms)",
+                    "type": "range",
+                    "options": [1, 100],
+                    "content": ["0", "3", "10"]
+                },
+                {
+                    "label": "Show Lock Indicators when Layer Key held",
+                    "type": "toggle",
+                    "content": ["0", "4", "0"]
+                }
+            ]
+        }
+    ],
     "layouts": {
         "LAYOUT_hhkb": {
             "layout": [
