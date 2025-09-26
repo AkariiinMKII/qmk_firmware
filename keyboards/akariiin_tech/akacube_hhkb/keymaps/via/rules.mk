@@ -21,3 +21,4 @@ SRC += custom_c/usr_layer_indicator.c # Layer indicator system library
 SRC += custom_c/usr_lock_indicator.c  # Lock indicator system library
 SRC += custom_c/usr_led_blink.c       # LED blink effects
 SRC += custom_c/usr_combo.c           # Combo key sequences
+SRC += custom_c/usr_via_config.c       # VIA configuration system
