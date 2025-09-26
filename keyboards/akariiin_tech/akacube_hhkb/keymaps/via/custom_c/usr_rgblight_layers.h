@@ -5,6 +5,7 @@
 
 #include "quantum.h"
 #include "usr_config.h"
+#include "usr_led_control.h"
 
 #ifndef USR_COLOR_LAYERLED_BG
 #    define USR_COLOR_LAYERLED_BG     HSV_RED_DIM
@@ -35,6 +36,22 @@
 #endif
 #ifndef USR_COLOR_BLINK
 #    define USR_COLOR_BLINK           HSV_RED_DIM
+#endif
+
+#if USR_LOCKLED_1 > 0
+#    define USR_COLOR_LOCKLED_BG1 USR_COLOR_LOCKLED_BG
+#else
+#    define USR_COLOR_LOCKLED_BG1 HSV_BLACK
+#endif
+#if USR_LOCKLED_2 > 0
+#    define USR_COLOR_LOCKLED_BG2 USR_COLOR_LOCKLED_BG
+#else
+#    define USR_COLOR_LOCKLED_BG2 HSV_BLACK
+#endif
+#if USR_LOCKLED_3 > 0
+#    define USR_COLOR_LOCKLED_BG3 USR_COLOR_LOCKLED_BG
+#else
+#    define USR_COLOR_LOCKLED_BG3 HSV_BLACK
 #endif
 
 void usr_rgblight_layers_init(void);
