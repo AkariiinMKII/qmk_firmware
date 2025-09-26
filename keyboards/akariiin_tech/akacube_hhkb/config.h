@@ -23,6 +23,9 @@
 #define VIA_EEPROM_LAYOUT_OPTIONS_SIZE 4
 #define VIA_EEPROM_CUSTOM_CONFIG_SIZE 16
 
+/* User datablock for VIA custom settings */
+#define EECONFIG_USER_DATA_SIZE 8
+
 /* Wear leveling settings */
 #define WEAR_LEVELING_LOGICAL_SIZE 1024
 #define WEAR_LEVELING_BACKING_SIZE 4096
