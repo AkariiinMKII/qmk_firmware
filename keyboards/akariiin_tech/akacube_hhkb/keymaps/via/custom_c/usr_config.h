@@ -3,6 +3,9 @@
 
 // User configuration for custom features
 
+//////////////////////////////////////////////////////////////////
+// WARNING: DO NOT EDIT
+//////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "quantum.h"
@@ -12,6 +15,17 @@ void led_blink_show(void);
 void led_blink_hide(void);
 bool usr_combo_any_active(void);
 
+#define disable     0
+#define numlock     1
+#define capslock    2
+#define scrolllock  4
+#define compose     8
+#define kana        16
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+// USER CUSTOM SETTINGS - EDIT BELOW THIS LINE
+//////////////////////////////////////////////////////////////////
 
 // ================== RGB LED COLORS ==================
 
@@ -37,11 +51,11 @@ bool usr_combo_any_active(void);
 
 // Lock LED mapping configuration
 // - Positions: USR_LOCKLED_1=LED 0-1 (left), USR_LOCKLED_2=LED 3-4 (middle), USR_LOCKLED_3=LED 6-7 (right)
-// - Available values: num_lock, caps_lock, scroll_lock, compose, kana, disable
+// - Available values: numlock, capslock, scrolllock, compose, kana, disable
 // - Setting all LOCKLEDs to 'disable' will disable the entire lock indicator system and force enable layer indicators
-#define USR_LOCKLED_1 num_lock
-#define USR_LOCKLED_2 caps_lock
-#define USR_LOCKLED_3 scroll_lock
+#define USR_LOCKLED_1 numlock
+#define USR_LOCKLED_2 capslock
+#define USR_LOCKLED_3 scrolllock
 
 // Lock LED timeout
 // - Time to keep lock indicators on after lock state changes (ms)

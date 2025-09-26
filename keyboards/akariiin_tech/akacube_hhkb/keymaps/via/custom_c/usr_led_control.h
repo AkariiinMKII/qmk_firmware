@@ -6,24 +6,17 @@
 #include "quantum.h"
 #include "usr_config.h"
 
-#define disable     0
-#define num_lock    1
-#define caps_lock   2
-#define scroll_lock 4
-#define compose     8
-#define kana        16
-
 #ifndef USR_LOCKLED_KEEPTIME
 #    define USR_LOCKLED_KEEPTIME 3000
 #endif
 #ifndef USR_LOCKLED_1
-#    define USR_LOCKLED_1 num_lock
+#    define USR_LOCKLED_1 1
 #endif
 #ifndef USR_LOCKLED_2
-#    define USR_LOCKLED_2 caps_lock
+#    define USR_LOCKLED_2 2
 #endif
 #ifndef USR_LOCKLED_3
-#    define USR_LOCKLED_3 scroll_lock
+#    define USR_LOCKLED_3 4
 #endif
 
 #if (USR_LOCKLED_1 | USR_LOCKLED_2 | USR_LOCKLED_3) > 0
