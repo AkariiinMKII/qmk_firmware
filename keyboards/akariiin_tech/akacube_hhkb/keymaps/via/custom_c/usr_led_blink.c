@@ -15,8 +15,8 @@ void led_blink_show(void) {
         blink_led_on = true;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(9, true);   // Background layer initial
-        rgblight_set_layer_state(10, true);  // Color layer initial
+        rgblight_set_layer_state(12, true);  // Background layer initial
+        rgblight_set_layer_state(13, true);  // Color layer initial
     }
 }
 
@@ -27,8 +27,8 @@ void led_blink_hide(void) {
         blink_led_on = false;
         blink_timer = 0;
 
-        rgblight_set_layer_state(9, false);  // Background layer off
-        rgblight_set_layer_state(10, false); // Color layer off
+        rgblight_set_layer_state(12, false); // Background layer off
+        rgblight_set_layer_state(13, false); // Color layer off
     }
 }
 
@@ -43,6 +43,6 @@ void led_blink_timer(void) {
         blink_led_on = !blink_led_on;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(10, blink_led_on);  // Toggle color layer
+        rgblight_set_layer_state(13, blink_led_on);  // Toggle color layer
     }
 }

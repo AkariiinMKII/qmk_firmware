@@ -3,29 +3,16 @@
 
 // User configuration for custom features
 
-//////////////////////////////////////////////////////////////////
-// WARNING: DO NOT EDIT
-//////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "quantum.h"
 #include "usr_rgb_colors.h"
+#include "usr_via_config.h"
 
 void led_blink_show(void);
 void led_blink_hide(void);
 bool usr_combo_any_active(void);
 
-#define disable     0
-#define numlock     1
-#define capslock    2
-#define scrolllock  4
-#define compose     8
-#define kana        16
-//////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////
-// USER CUSTOM SETTINGS - EDIT BELOW THIS LINE
-//////////////////////////////////////////////////////////////////
 
 // ================== RGB LED COLORS ==================
 
@@ -60,11 +47,6 @@ bool usr_combo_any_active(void);
 // Lock LED timeout
 // - Time to keep lock indicators on after lock state changes (ms)
 #define USR_LOCKLED_KEEPTIME 1000
-
-// Layer key behavior
-// - Uncomment to show lock indicators when layer keys pressed down
-// - This will disable layer indicators unless all lock indicators are disabled
-#define LAYER_KEY_SHOW_LOCK_INDICATORS
 
 
 // ================== LED BLINK SYSTEM ==================
