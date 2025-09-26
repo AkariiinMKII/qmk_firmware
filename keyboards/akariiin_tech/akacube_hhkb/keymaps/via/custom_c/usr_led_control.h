@@ -26,7 +26,11 @@
 #    define USR_LOCKLED_3 scroll_lock
 #endif
 
-#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
+#if (USR_LOCKLED_1 | USR_LOCKLED_2 | USR_LOCKLED_3) > 0
+#    define LOCKLED_SYSTEM_ENABLE
+#endif
+
+#ifdef LOCKLED_SYSTEM_ENABLE
 void lock_indicator_update(led_t led_state);
 void lock_indicator_timer(layer_state_t state);
 #endif
