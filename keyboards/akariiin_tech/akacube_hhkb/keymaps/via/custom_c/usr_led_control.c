@@ -5,7 +5,7 @@
 #include "usr_layer_indicator.h"
 #include "usr_lock_indicator.h"
 
-#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
+#ifdef LOCKLED_SYSTEM_ENABLE
 // Lock state management - moved from usr_lock_indicator.c
 // Single bitmask cache for all lock states
 static uint8_t lock_last_state = 0;
@@ -23,7 +23,7 @@ static bool lockled_timeouted = false;
 // Update lock indicators when state changes
 void lock_indicator_update(led_t led_state) {
     // Get current lock state bitmask for enabled LEDs
-    uint8_t lock_current_state = led_state.raw & (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3);
+    uint8_t lock_current_state = led_state.raw & (USR_LOCKLED_1 | USR_LOCKLED_2 | USR_LOCKLED_3);
 
     // Only update if state changed
     if (lock_current_state != lock_last_state) {
@@ -68,7 +68,7 @@ static layer_state_t layer_last_state = 0;
 
 // Update layer indicators
 void layer_indicator_update(layer_state_t state) {
-#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
+#ifdef LOCKLED_SYSTEM_ENABLE
 #ifdef LAYER_KEY_SHOW_LOCK_INDICATORS
     if (state != layer_last_state) {
         layer_last_state = state;

@@ -15,7 +15,7 @@ void keyboard_post_init_user(void) {
 }
 
 // Update RGB indicators when lock states change
-#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
+#ifdef LOCKLED_SYSTEM_ENABLE
 bool led_update_user(led_t led_state) {
     lock_indicator_update(led_state);
     return true;
@@ -35,7 +35,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-#if (USR_LOCKLED_1 + USR_LOCKLED_2 + USR_LOCKLED_3) > 0
+#ifdef LOCKLED_SYSTEM_ENABLE
     lock_indicator_timer(layer_state);
 #endif
     usr_combo_handler();
