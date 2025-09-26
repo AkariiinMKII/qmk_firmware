@@ -33,13 +33,13 @@ static const rgblight_segment_t PROGMEM usr_layer_layerled_mo4[] = RGBLIGHT_LAYE
 );
 
 // 6. Lock LED background layer
-// Background color for lock positions (0,1,3,4,6,7), black for layer-only positions (2,5)
+// Background color for enabled lock positions, black for others
 static const rgblight_segment_t PROGMEM usr_layer_lockled_bg[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 2, USR_COLOR_LOCKLED_BG},     // LEDs 0-1: Lock 1 area background
+    {0, 2, USR_COLOR_LOCKLED_BG1},    // LEDs 0-1: Lock 1 area background
     {2, 1, HSV_BLACK},                // LED 2: Black
-    {3, 2, USR_COLOR_LOCKLED_BG},     // LEDs 3-4: Lock 2 area background
+    {3, 2, USR_COLOR_LOCKLED_BG2},    // LEDs 3-4: Lock 2 area background
     {5, 1, HSV_BLACK},                // LED 5: Black
-    {6, 2, USR_COLOR_LOCKLED_BG}      // LEDs 6-7: Lock 3 area background
+    {6, 2, USR_COLOR_LOCKLED_BG3}     // LEDs 6-7: Lock 3 area background
 );
 
 // 7-9. Lock indicators (highest priority): lock1(0-1), lock2(3-4), lock3(6-7)
