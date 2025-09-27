@@ -7,6 +7,23 @@
 
 #include "quantum.h"
 
+// Dim color selection index (for VIA configuration)
+enum dim_color_index {
+    DIM_COLOR_RED = 0,
+    DIM_COLOR_ORANGE = 1,
+    DIM_COLOR_YELLOW = 2,
+    DIM_COLOR_LIME = 3,
+    DIM_COLOR_GREEN = 4,
+    DIM_COLOR_TEAL = 5,
+    DIM_COLOR_CYAN = 6,
+    DIM_COLOR_AZURE = 7,
+    DIM_COLOR_BLUE = 8,
+    DIM_COLOR_PURPLE = 9,
+    DIM_COLOR_MAGENTA = 10,
+    DIM_COLOR_ROSE = 11,
+    DIM_COLOR_WHITE = 12
+};
+
 // Brightness levels
 #define HSV_VAL_DIM      96   // Dimmed brightness level
 #define HSV_VAL_BRIGHT   192  // Bright brightness level
@@ -55,6 +72,7 @@
 #define HSV_PURPLE_DIM   191, 255, HSV_VAL_DIM
 #define HSV_MAGENTA_DIM  213, 255, HSV_VAL_DIM
 #define HSV_ROSE_DIM     234, 255, HSV_VAL_DIM
+#define HSV_WHITE_DIM    0,   0,   HSV_VAL_DIM
 
 // Basic Colors - Dark Level
 #define HSV_RED_DARK      0,   255, HSV_VAL_DARK

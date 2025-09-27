@@ -22,8 +22,8 @@ static bool lockled_timeouted = false;
 void lock_indicator_update(led_t led_state) {
     if (!usr_via_lock_system_enabled()) return;
     
-    // Get current lock state bitmask for enabled LEDs
-    uint8_t lock_current_state = led_state.raw & (usr_via_get_lock_led_1() | usr_via_get_lock_led_2() | usr_via_get_lock_led_3());
+    // Get current lock state bitmask for enabled LEDs - using hardcoded indices
+    uint8_t lock_current_state = led_state.raw & (usr_via_get_config(0, 0) | usr_via_get_config(1, 0) | usr_via_get_config(2, 0));
 
     // Only update if state changed
     if (lock_current_state != lock_last_state) {
