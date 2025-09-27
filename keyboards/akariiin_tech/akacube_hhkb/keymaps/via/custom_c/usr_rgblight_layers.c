@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "usr_rgblight_layers.h"
+#include "usr_via_config.h"
+#include "usr_rgb_colors.h"
+
+// Function to get HSV dim color directly from VIA config
 
 // RGB Layer Definitions (ordered by priority: lowest → highest)
 
@@ -38,34 +42,30 @@ static const rgblight_segment_t PROGMEM usr_layer_lockled_bg[] = RGBLIGHT_LAYER_
 );
 
 // 7-9. Lock LED background layers (show background color if enabled)
+static const rgblight_segment_t PROGMEM usr_layer_lockled_bg0[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 2, USR_COLOR_LOCKLED_BG}      // LEDs 0-1: Lock 0 area background
+);
 static const rgblight_segment_t PROGMEM usr_layer_lockled_bg1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 2, USR_COLOR_LOCKLED_BG}      // LEDs 0-1: Lock 1 area background
+    {3, 2, USR_COLOR_LOCKLED_BG}      // LEDs 3-4: Lock 1 area background
 );
 static const rgblight_segment_t PROGMEM usr_layer_lockled_bg2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {3, 2, USR_COLOR_LOCKLED_BG}      // LEDs 3-4: Lock 2 area background
-);
-static const rgblight_segment_t PROGMEM usr_layer_lockled_bg3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {6, 2, USR_COLOR_LOCKLED_BG}      // LEDs 6-7: Lock 3 area background
+    {6, 2, USR_COLOR_LOCKLED_BG}      // LEDs 6-7: Lock 2 area background
 );
 
-// 10-12. Lock indicators (highest priority): lock1(0-1), lock2(3-4), lock3(6-7)
+// 10-12. Lock indicators (highest priority): lock0(0-1), lock1(3-4), lock2(6-7)
+static const rgblight_segment_t PROGMEM usr_layer_lockled_0[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 2, USR_COLOR_LOCKLED_0}       // LEDs 0-1: Lock 0
+);
 static const rgblight_segment_t PROGMEM usr_layer_lockled_1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 2, USR_COLOR_LOCKLED_1}       // LEDs 0-1: Lock 1
+    {3, 2, USR_COLOR_LOCKLED_1}       // LEDs 3-4: Lock 1
 );
 static const rgblight_segment_t PROGMEM usr_layer_lockled_2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {3, 2, USR_COLOR_LOCKLED_2}       // LEDs 3-4: Lock 2
-);
-static const rgblight_segment_t PROGMEM usr_layer_lockled_3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {6, 2, USR_COLOR_LOCKLED_3}       // LEDs 6-7: Lock 3
+    {6, 2, USR_COLOR_LOCKLED_2}       // LEDs 6-7: Lock 2
 );
 
 // 13-14. Blink layers (highest priority)
-static const rgblight_segment_t PROGMEM usr_layer_blink_bg[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 8, HSV_BLACK}                 // LED 0-7: Blink background
-);
-static const rgblight_segment_t PROGMEM usr_layer_blink[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 8, USR_COLOR_BLINK}           // LED 0-7: Blink color
-);
+static const rgblight_segment_t PROGMEM usr_layer_blink_bg[] = RGBLIGHT_LAYER_SEGMENTS({0, 8, HSV_BLACK});
+static const rgblight_segment_t PROGMEM usr_layer_blink[] = RGBLIGHT_LAYER_SEGMENTS({0, 8, USR_COLOR_BLINK});
 
 // Layer mapping array
 // Priority order: layer background → layer indicators → lock black bg → lock color bgs → lock indicators → blink layers
@@ -76,12 +76,12 @@ const rgblight_segment_t* const PROGMEM usr_rgblight_layers[] = RGBLIGHT_LAYERS_
     usr_layer_layerled_mo3,           // 3: Layer 3
     usr_layer_layerled_mo4,           // 4: Layer 4
     usr_layer_lockled_bg,             // 5: All-black lock background
-    usr_layer_lockled_bg1,            // 6: Lock 1 color background
-    usr_layer_lockled_bg2,            // 7: Lock 2 color background
-    usr_layer_lockled_bg3,            // 8: Lock 3 color background
-    usr_layer_lockled_1,              // 9: Lock 1 indicator
-    usr_layer_lockled_2,              // 10: Lock 2 indicator
-    usr_layer_lockled_3,              // 11: Lock 3 indicator
+    usr_layer_lockled_bg0,            // 6: Lock 0 color background
+    usr_layer_lockled_bg1,            // 7: Lock 1 color background
+    usr_layer_lockled_bg2,            // 8: Lock 2 color background
+    usr_layer_lockled_0,              // 9: Lock 0 indicator
+    usr_layer_lockled_1,              // 10: Lock 1 indicator
+    usr_layer_lockled_2,              // 11: Lock 2 indicator
     usr_layer_blink_bg,               // 12: Blink background
     usr_layer_blink                   // 13: Blink color
 );
@@ -100,12 +100,12 @@ void usr_rgblight_layers_init(void) {
 
     // Lock LED layers
     rgblight_set_layer_state(5, false);   // All-black lock background off
-    rgblight_set_layer_state(6, false);   // Lock 1 color background off
-    rgblight_set_layer_state(7, false);   // Lock 2 color background off
-    rgblight_set_layer_state(8, false);   // Lock 3 color background off
-    rgblight_set_layer_state(9, false);   // Lock 1 indicator off
-    rgblight_set_layer_state(10, false);  // Lock 2 indicator off
-    rgblight_set_layer_state(11, false);  // Lock 3 indicator off
+    rgblight_set_layer_state(6, false);   // Lock 0 color background off
+    rgblight_set_layer_state(7, false);   // Lock 1 color background off
+    rgblight_set_layer_state(8, false);   // Lock 2 color background off
+    rgblight_set_layer_state(9, false);   // Lock 0 indicator off
+    rgblight_set_layer_state(10, false);  // Lock 1 indicator off
+    rgblight_set_layer_state(11, false);  // Lock 2 indicator off
 
     // Blink layers
     rgblight_set_layer_state(12, false);  // Blink background off

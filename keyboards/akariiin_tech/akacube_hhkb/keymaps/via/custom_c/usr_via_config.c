@@ -3,11 +3,16 @@
 
 #include "usr_via_config.h"
 #include "usr_led_control.h"
+#include "usr_rgb_colors.h"
+#include "usr_rgblight_layers.h"
 #include "eeconfig.h"
 
 // Compile-time check to ensure EEPROM user data space is sufficient
-_Static_assert(sizeof(uint32_t) <= EECONFIG_USER_DATA_SIZE, "EEPROM user data size too small for configuration");
+_Static_assert(8 <= EECONFIG_USER_DATA_SIZE, "EEPROM user data size too small for configuration");
 
+// Magic marker to detect if EEPROM has been initialized
+// Using keyboard-specific EEPROM space (eeconfig_read_kb)
+#define EEPROM_MAGIC_MARKER 0xAC8BAC8B  // "AkaCube" inspired 32-bit marker
 
 // VIA Configuration Channel IDs
 enum via_config_channels {
@@ -16,11 +21,19 @@ enum via_config_channels {
 
 // VIA Configuration Value IDs for Lock LEDs
 enum lock_led_config_ids {
-    LOCK_LED_1_CONFIG = 0,
-    LOCK_LED_2_CONFIG = 1,
-    LOCK_LED_3_CONFIG = 2,
-    LOCK_LED_TIMEOUT_CONFIG = 3,
-    LAYERKEY_SHOW_LOCKLED_CONFIG = 4
+    LOCK_LED_0_CONFIG = 0,
+    LOCK_LED_0_COLOR_OFF = 1,
+    LOCK_LED_0_COLOR_ON = 2,
+    LOCK_LED_1_CONFIG = 3,
+    LOCK_LED_1_COLOR_OFF = 4,
+    LOCK_LED_1_COLOR_ON = 5,
+    LOCK_LED_2_CONFIG = 6,
+    LOCK_LED_2_COLOR_OFF = 7,
+    LOCK_LED_2_COLOR_ON = 8,
+    LAYER_LED_COLOR_OFF = 9,
+    LAYER_LED_COLOR_ON = 10,
+    LOCK_LED_TIMEOUT_CONFIG = 11,
+    LAYERKEY_SHOW_LOCKLED_CONFIG = 12
 };
 
 // Lock LED type values (must match VIA UI)
@@ -33,32 +46,26 @@ enum lock_led_types {
     LOCK_TYPE_KANA = 16
 };
 
-// Runtime configuration storage
-static uint8_t via_lock_led_1 = USR_LOCKLED_1;
-static uint8_t via_lock_led_2 = USR_LOCKLED_2;
-static uint8_t via_lock_led_3 = USR_LOCKLED_3;
-static uint8_t via_lock_timeout = USR_LOCKLED_KEEPTIME / 100;
-static uint8_t via_layerkey_show_lockled = 0;
+// Configuration initialization flag
+static bool config_loaded = false;
 
-// Compact pack/unpack helpers for 32-bit EEPROM storage
-// Bit layout: [unused:11][layerkey_flag:1][timeout:7][lock_led_3:5][lock_led_2:5][lock_led_1:5]
-static uint32_t pack_config(void) {
-    return (uint32_t)(via_lock_led_1 & 0x1F) |           // 5 bits for led1 (0-16)
-           ((uint32_t)(via_lock_led_2 & 0x1F) << 5) |    // 5 bits for led2
-           ((uint32_t)(via_lock_led_3 & 0x1F) << 10) |   // 5 bits for led3
-           ((uint32_t)(via_lock_timeout & 0x7F) << 15) | // 7 bits for timeout (1-100)
-           ((uint32_t)(via_layerkey_show_lockled & 1) << 22); // 1 bit for flag
-}
+// Runtime configuration storage - 4x3 matrix for all config
+// Rows 0-2: Lock LED config [mask, color_off, color_on]
+// Row 3: Misc config [timeout|flag, layer_off, layer_on] where first element packs timeout(7bits)+flag(1bit)
+static uint8_t via_config[4][3] = {
+    {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 0: Lock LED 0
+    {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 1: Lock LED 1
+    {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 2: Lock LED 2
+    {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}  // Row 3: Misc config
+};
 
-static void unpack_config(uint32_t packed) {
-    via_lock_led_1 = (uint8_t)(packed & 0x1F);
-    via_lock_led_2 = (uint8_t)((packed >> 5) & 0x1F);
-    via_lock_led_3 = (uint8_t)((packed >> 10) & 0x1F);
-    via_lock_timeout = (uint8_t)((packed >> 15) & 0x7F);
-    via_layerkey_show_lockled = (uint8_t)((packed >> 22) & 1);
-}
+// 64-bit user datablock storage layout (8 bytes)
+// Bytes 0-1: Lock LED 0 - (led_mask:8, off_color:4, on_color:4)
+// Bytes 2-3: Lock LED 1 - (led_mask:8, off_color:4, on_color:4)
+// Bytes 4-5: Lock LED 2 - (led_mask:8, off_color:4, on_color:4)
+// Bytes 6-7: Misc config (layer_off:4, layer_on:4, timeout:7, flag:1)
 
-// Validation helpers
+// Validation functions
 static bool is_valid_lock_led_value(uint8_t value) {
     return (value == 0 || value == 1 || value == 2 || value == 4 || value == 8 || value == 16);
 }
@@ -67,123 +74,241 @@ static bool is_valid_timeout_value(uint8_t value) {
     return (value >= 1 && value <= 100);
 }
 
-// Individual save functions with validation and change detection
-static bool save_lock_led_1(uint8_t new_value) {
-    if (is_valid_lock_led_value(new_value) && via_lock_led_1 != new_value) {
-        via_lock_led_1 = new_value;
-        eeconfig_update_kb(pack_config());
-        return true;
-    }
-    return false;
+static bool is_valid_color_index(uint8_t value) {
+    return (value <= DIM_COLOR_WHITE);  // 0-12 are valid, 4-bit storage allows 0-15
 }
 
-static bool save_lock_led_2(uint8_t new_value) {
-    if (is_valid_lock_led_value(new_value) && via_lock_led_2 != new_value) {
-        via_lock_led_2 = new_value;
-        eeconfig_update_kb(pack_config());
-        return true;
-    }
-    return false;
+// Data packing/unpacking functions
+static uint16_t pack_matrix_row(uint8_t row_index) {
+    // All rows use same packing: (col0:8, col1:4, col2:4)
+    return (uint16_t)via_config[row_index][0] |                           // bits 0-7: column 0
+           ((uint16_t)(via_config[row_index][1] & 0xF) << 8) |           // bits 8-11: column 1
+           ((uint16_t)(via_config[row_index][2] & 0xF) << 12);           // bits 12-15: column 2
 }
 
-static bool save_lock_led_3(uint8_t new_value) {
-    if (is_valid_lock_led_value(new_value) && via_lock_led_3 != new_value) {
-        via_lock_led_3 = new_value;
-        eeconfig_update_kb(pack_config());
-        return true;
-    }
-    return false;
+static void unpack_matrix_row(uint16_t packed, uint8_t row_index) {
+    // All rows use same unpacking: (col0:8, col1:4, col2:4)
+    via_config[row_index][0] = (uint8_t)(packed & 0xFF);
+    via_config[row_index][1] = (uint8_t)((packed >> 8) & 0xF);
+    via_config[row_index][2] = (uint8_t)((packed >> 12) & 0xF);
 }
 
-static bool save_lock_timeout(uint8_t new_value) {
-    if (is_valid_timeout_value(new_value) && via_lock_timeout != new_value) {
-        via_lock_timeout = new_value;
-        eeconfig_update_kb(pack_config());
-        return true;
-    }
-    return false;
+// Mixed timeout/flag manipulation functions
+static uint8_t pick_mixed_time(void) {
+    return via_config[3][0] & 0x7F;  // Lower 7 bits
 }
 
-static bool save_layerkey_show_lockled(uint8_t new_value) {
-    if (via_layerkey_show_lockled != new_value) {
-        via_layerkey_show_lockled = new_value;
-        eeconfig_update_kb(pack_config());
-        return true;
-    }
-    return false;
+static uint8_t pick_mixed_flag(void) {
+    return (via_config[3][0] >> 7) & 0x1;  // Upper 1 bit
 }
 
-// Configuration valid flag
-static bool config_loaded = false;
+static uint8_t merge_mixed_time(uint8_t new_timeout) {
+    uint8_t flag = pick_mixed_flag();
+    return (new_timeout & 0x7F) | (flag << 7);
+}
+
+static uint8_t merge_mixed_flag(uint8_t new_flag) {
+    uint8_t timeout = pick_mixed_time();
+    return (timeout & 0x7F) | ((new_flag & 0x1) << 7);
+}
+// EEPROM I/O functions
+static void eeload_all_config(void) {
+    uint8_t config[8];
+    eeconfig_read_user_datablock(config, 0, 8);
+    for (uint8_t row = 0; row < 4; row++) {
+        uint8_t offset = row * 2;
+        uint16_t packed = (uint16_t)config[offset] | ((uint16_t)config[offset + 1] << 8);
+        unpack_matrix_row(packed, row);
+    }
+}
+
+static void eesave_all_config(void) {
+    uint8_t config[8];
+    for (uint8_t row = 0; row < 4; row++) {
+        uint16_t packed = pack_matrix_row(row);
+        uint8_t offset = row * 2;
+        config[offset] = (uint8_t)(packed & 0xFF);
+        config[offset + 1] = (uint8_t)((packed >> 8) & 0xFF);
+    }
+    eeconfig_update_user_datablock(config, 0, 8);
+}
+
+static void eesave_config_matrix_row(uint8_t row_index) {
+    if (row_index > 3) return;
+
+    uint16_t packed = pack_matrix_row(row_index);
+    uint8_t offset = row_index * 2;
+    uint8_t data[2] = {
+        (uint8_t)(packed & 0xFF),
+        (uint8_t)((packed >> 8) & 0xFF)
+    };
+    eeconfig_update_user_datablock(data, offset, 2);
+}
+
+
+// Core configuration functions
+static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_value) {
+    // Validate parameters
+    if (row_index > 3 || col_index > 2) {
+        return false;
+    }
+
+    // Check if value is different
+    if (via_config[row_index][col_index] == new_value) {
+        return false; // No change needed
+    }
+
+    // Validate new value based on position
+    bool is_valid = false;
+    switch (col_index) {
+        case 0:
+            if (row_index < 3) {
+                is_valid = is_valid_lock_led_value(new_value);
+            } else {
+                // For packed timeout/flag, validate the entire byte
+                uint8_t timeout = new_value & 0x7F;
+                is_valid = is_valid_timeout_value(timeout);
+            }
+            break;
+        default:  // case 1, 2
+            is_valid = is_valid_color_index(new_value);  // Same for all rows
+            break;
+    }
+
+    if (!is_valid) return false;
+
+    // Update the value and save to EEPROM
+    via_config[row_index][col_index] = new_value;
+    eesave_config_matrix_row(row_index);
+    return true;
+}
 
 // Initialize VIA configuration from EEPROM using user datablock
 void usr_via_config_init(void) {
     if (config_loaded) return;
 
-    uint32_t stored_config = eeconfig_read_kb();
-    unpack_config(stored_config);
+    // Define default configuration
+    static const uint8_t default_config[4][3] = {
+        {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 0
+        {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 1
+        {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 2
+        {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}  // Misc: timeout|flag, layer_off, layer_on
+    };
 
-    // Validate loaded config (handles both invalid data and first boot)
-    if (!is_valid_lock_led_value(via_lock_led_1) || !is_valid_lock_led_value(via_lock_led_2) ||
-        !is_valid_lock_led_value(via_lock_led_3) || !is_valid_timeout_value(via_lock_timeout)) {
-        // Reset to defaults if invalid or first boot
-        via_lock_led_1 = USR_LOCKLED_1;
-        via_lock_led_2 = USR_LOCKLED_2;
-        via_lock_led_3 = USR_LOCKLED_3;
-        via_lock_timeout = USR_LOCKLED_KEEPTIME / 100;
-        via_layerkey_show_lockled = 0;
-        usr_via_config_save();
+    // Check if EEPROM was reset
+    if (eeconfig_read_kb() != EEPROM_MAGIC_MARKER) {
+        // EEPROM was reset - apply defaults and save
+        memcpy(via_config, default_config, sizeof(via_config));
+        eesave_all_config();
+        eeconfig_update_kb(EEPROM_MAGIC_MARKER);
+        config_loaded = true;
+        usr_refresh_indicator();
+        return;
+    }
+
+    // Normal initialization - load from EEPROM
+    eeload_all_config();
+    
+    // Validate loaded config per-row (handles corrupted data)
+    for (uint8_t row = 0; row < 4; row++) {
+        bool should_reset_row = false;
+        
+        if (row < 3) {
+            // Validate LED row
+            if (!is_valid_lock_led_value(via_config[row][0]) ||
+                !is_valid_color_index(via_config[row][1]) ||
+                !is_valid_color_index(via_config[row][2])) {
+                should_reset_row = true;
+            }
+        } else {
+            // Validate misc row (row 3)
+            if (!is_valid_timeout_value(pick_mixed_time()) ||
+                !is_valid_color_index(via_config[3][1]) ||
+                !is_valid_color_index(via_config[3][2])) {
+                should_reset_row = true;
+            }
+        }
+        
+        if (should_reset_row) {
+            // Reset only this row to defaults
+            memcpy(via_config[row], default_config[row], 3);
+            eesave_config_matrix_row(row);
+        }
     }
 
     config_loaded = true;
+
+    // Update RGB layers with current colors
+    // usr_rgblight_layers_update_colors(); // TODO: Commented for debug - function removed
+    usr_refresh_indicator();
 }
 
 void usr_via_config_save(void) {
-    eeconfig_update_kb(pack_config());
+    eesave_all_config();
 }
 
-uint8_t usr_via_get_lock_led_1(void) { return via_lock_led_1; }
-
-uint8_t usr_via_get_lock_led_2(void) { return via_lock_led_2; }
-
-uint8_t usr_via_get_lock_led_3(void) { return via_lock_led_3; }
-
-uint8_t usr_via_get_lock_timeout(void) { return via_lock_timeout; }
-
-bool usr_via_get_layerkey_show_lockled(void) { return via_layerkey_show_lockled != 0; }
+// Public API functions
+uint8_t usr_via_get_config(uint8_t row, uint8_t col) {
+    if (row > 3 || col > 2 || (row == 3 && col == 0)) return 0;
+    return via_config[row][col];
+}
+uint8_t usr_via_get_lock_timeout(void) { return pick_mixed_time(); }
+bool usr_via_get_layerkey_show_lockled(void) { return pick_mixed_flag() != 0; }
 
 bool usr_via_lock_system_enabled(void) {
-    return (via_lock_led_1 | via_lock_led_2 | via_lock_led_3) > 0;
+    return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
 }
 
-// VIA custom value command handler (VIA v3 protocol)
+// VIA protocol handler
 void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
     // data = [ command_id, channel_id, value_id, value_data ]
     uint8_t *command_id = &(data[0]);
     uint8_t *channel_id = &(data[1]);
     uint8_t *value_id   = &(data[2]);
     uint8_t *value_data = &(data[3]);
-
-
     // Check if this is for our custom lock LED channel
     if (*channel_id == LOCK_LED_CONFIG_CHANNEL) {
         switch (*command_id) {
             case id_custom_get_value: {
                 switch (*value_id) {
+                    case LOCK_LED_0_CONFIG:
+                        value_data[0] = via_config[0][0];
+                        break;
+                    case LOCK_LED_0_COLOR_OFF:
+                        value_data[0] = via_config[0][1];
+                        break;
+                    case LOCK_LED_0_COLOR_ON:
+                        value_data[0] = via_config[0][2];
+                        break;
                     case LOCK_LED_1_CONFIG:
-                        value_data[0] = via_lock_led_1;
+                        value_data[0] = via_config[1][0];
+                        break;
+                    case LOCK_LED_1_COLOR_OFF:
+                        value_data[0] = via_config[1][1];
+                        break;
+                    case LOCK_LED_1_COLOR_ON:
+                        value_data[0] = via_config[1][2];
                         break;
                     case LOCK_LED_2_CONFIG:
-                        value_data[0] = via_lock_led_2;
+                        value_data[0] = via_config[2][0];
                         break;
-                    case LOCK_LED_3_CONFIG:
-                        value_data[0] = via_lock_led_3;
+                    case LOCK_LED_2_COLOR_OFF:
+                        value_data[0] = via_config[2][1];
+                        break;
+                    case LOCK_LED_2_COLOR_ON:
+                        value_data[0] = via_config[2][2];
+                        break;
+                    case LAYER_LED_COLOR_OFF:
+                        value_data[0] = via_config[3][1];
+                        break;
+                    case LAYER_LED_COLOR_ON:
+                        value_data[0] = via_config[3][2];
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
-                        value_data[0] = via_lock_timeout;
+                        value_data[0] = pick_mixed_time();
                         break;
                     case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        value_data[0] = via_layerkey_show_lockled;
+                        value_data[0] = pick_mixed_flag();
                         break;
                     default:
                         *command_id = id_unhandled;
@@ -192,32 +317,53 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                 break;
             }
             case id_custom_set_value: {
-                uint8_t new_value = value_data[0];
-                bool config_changed = false;
-
+                bool should_update_leds = false;
                 switch (*value_id) {
+                    case LOCK_LED_0_CONFIG:
+                        should_update_leds = via_update_config(0, 0, value_data[0]);
+                        break;
+                    case LOCK_LED_0_COLOR_OFF:
+                        should_update_leds = via_update_config(0, 1, value_data[0]);
+                        break;
+                    case LOCK_LED_0_COLOR_ON:
+                        should_update_leds = via_update_config(0, 2, value_data[0]);
+                        break;
                     case LOCK_LED_1_CONFIG:
-                        config_changed = save_lock_led_1(new_value);
+                        should_update_leds = via_update_config(1, 0, value_data[0]);
+                        break;
+                    case LOCK_LED_1_COLOR_OFF:
+                        should_update_leds = via_update_config(1, 1, value_data[0]);
+                        break;
+                    case LOCK_LED_1_COLOR_ON:
+                        should_update_leds = via_update_config(1, 2, value_data[0]);
                         break;
                     case LOCK_LED_2_CONFIG:
-                        config_changed = save_lock_led_2(new_value);
+                        should_update_leds = via_update_config(2, 0, value_data[0]);
                         break;
-                    case LOCK_LED_3_CONFIG:
-                        config_changed = save_lock_led_3(new_value);
+                    case LOCK_LED_2_COLOR_OFF:
+                        should_update_leds = via_update_config(2, 1, value_data[0]);
+                        break;
+                    case LOCK_LED_2_COLOR_ON:
+                        should_update_leds = via_update_config(2, 2, value_data[0]);
+                        break;
+                    case LAYER_LED_COLOR_OFF:
+                        should_update_leds = via_update_config(3, 1, value_data[0]);
+                        break;
+                    case LAYER_LED_COLOR_ON:
+                        should_update_leds = via_update_config(3, 2, value_data[0]);
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
-                        config_changed = save_lock_timeout(new_value);
+                        via_update_config(3, 0, merge_mixed_time(value_data[0]));
                         break;
                     case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        config_changed = save_layerkey_show_lockled(new_value);
+                        should_update_leds = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
                         break;
                     default:
                         *command_id = id_unhandled;
                         return;
                 }
-
-                if (config_changed) {
-                    // Trigger reconfiguration of lock system
+                if (should_update_leds) {
+                    // usr_rgblight_layers_update_colors(); // TODO: Commented for debug - function removed
                     usr_refresh_indicator();
                 }
                 break;
