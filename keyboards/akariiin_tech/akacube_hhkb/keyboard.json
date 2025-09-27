@@ -80,7 +80,7 @@
             "label": "RGB Indicators",
             "content": [
                 {
-                    "label": "Indicator 1",
+                    "label": "Lock LED 1 - Type",
                     "type": "dropdown",
                     "options": [
                         ["Disabled", 0],
@@ -93,7 +93,47 @@
                     "content": ["0", "0", "0"]
                 },
                 {
-                    "label": "Indicator 2",
+                    "label": "Lock LED 1 - OFF Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "0", "1"]
+                },
+                {
+                    "label": "Lock LED 1 - ON Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "0", "2"]
+                },
+                {
+                    "label": "Lock LED 2 - Type",
                     "type": "dropdown",
                     "options": [
                         ["Disabled", 0],
@@ -106,7 +146,47 @@
                     "content": ["0", "1", "0"]
                 },
                 {
-                    "label": "Indicator 3",
+                    "label": "Lock LED 2 - OFF Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "1", "1"]
+                },
+                {
+                    "label": "Lock LED 2 - ON Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "1", "2"]
+                },
+                {
+                    "label": "Lock LED 3 - Type",
                     "type": "dropdown",
                     "options": [
                         ["Disabled", 0],
@@ -119,15 +199,95 @@
                     "content": ["0", "2", "0"]
                 },
                 {
-                    "label": "Indicator Timeout (100-10000ms)",
-                    "type": "range",
-                    "options": [1, 100],
-                    "content": ["0", "3", "10"]
+                    "label": "Lock LED 3 - OFF Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "2", "1"]
                 },
                 {
-                    "label": "Show Lock Indicators when Layer Key held",
+                    "label": "Lock LED 3 - ON Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "2", "2"]
+                },
+                {
+                    "label": "Layer LED - OFF Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "3", "1"]
+                },
+                {
+                    "label": "Layer LED - ON Color",
+                    "type": "dropdown",
+                    "options": [
+                        ["Red", 0],
+                        ["Orange", 1],
+                        ["Yellow", 2],
+                        ["Lime", 3],
+                        ["Green", 4],
+                        ["Teal", 5],
+                        ["Cyan", 6],
+                        ["Azure", 7],
+                        ["Blue", 8],
+                        ["Purple", 9],
+                        ["Magenta", 10],
+                        ["Rose", 11],
+                        ["White", 12]
+                    ],
+                    "content": ["0", "3", "2"]
+                },
+                {
+                    "label": "Lock LED Timeout (1-100 deciseconds)",
+                    "type": "range",
+                    "options": [1, 100],
+                    "content": ["0", "11", "30"]
+                },
+                {
+                    "label": "Show Lock LEDs when Layer Key held",
                     "type": "toggle",
-                    "content": ["0", "4", "0"]
+                    "content": ["0", "12", "0"]
                 }
             ]
         }
