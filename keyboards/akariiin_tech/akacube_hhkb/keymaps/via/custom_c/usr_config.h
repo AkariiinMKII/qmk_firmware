@@ -25,9 +25,9 @@ bool usr_combo_any_active(void);
 
 // Lock indicator colors
 #define USR_COLOR_LOCKLED_BG      HSV_RED_DIM   // Stands for lock off
-#define USR_COLOR_LOCKLED_1       HSV_GREEN_DIM
-#define USR_COLOR_LOCKLED_2       HSV_GREEN_DIM
-#define USR_COLOR_LOCKLED_3       HSV_GREEN_DIM
+#define USR_COLOR_LOCKLED_0       HSV_GREEN_DIM  // Lock LED 0
+#define USR_COLOR_LOCKLED_1       HSV_GREEN_DIM  // Lock LED 1
+#define USR_COLOR_LOCKLED_2       HSV_GREEN_DIM  // Lock LED 2
 
 // Blink effect color
 #define USR_COLOR_BLINK           HSV_RED_DIM
@@ -37,12 +37,12 @@ bool usr_combo_any_active(void);
 // Note: Due to API limitations, lock indicators may not work properly on some operating systems
 
 // Lock LED mapping configuration
-// - Positions: USR_LOCKLED_1=LED 0-1 (left), USR_LOCKLED_2=LED 3-4 (middle), USR_LOCKLED_3=LED 6-7 (right)
+// - Hardware positions: USR_LOCKLED_0=LED 0-1 (left), USR_LOCKLED_1=LED 3-4 (middle), USR_LOCKLED_2=LED 6-7 (right)
 // - Available values: numlock, capslock, scrolllock, compose, kana, disable
 // - Setting all LOCKLEDs to 'disable' will disable the entire lock indicator system and force enable layer indicators
-#define USR_LOCKLED_1 numlock
-#define USR_LOCKLED_2 capslock
-#define USR_LOCKLED_3 scrolllock
+#define USR_LOCKLED_0 numlock
+#define USR_LOCKLED_1 capslock
+#define USR_LOCKLED_2 scrolllock
 
 // Lock LED timeout
 // - Time to keep lock indicators on after lock state changes (ms)

@@ -12,8 +12,8 @@
 
 // Initialize RGB layers and VIA configuration on startup
 void keyboard_post_init_user(void) {
-    usr_via_config_init();
-    usr_rgblight_layers_init();
+    usr_rgblight_layers_init();     // Initialize RGB layers first with default colors
+    usr_via_config_init();          // Then load VIA config and update colors
 }
 
 // Update RGB indicators when lock states change
