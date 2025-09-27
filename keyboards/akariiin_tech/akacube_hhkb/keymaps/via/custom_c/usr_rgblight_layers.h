@@ -55,3 +55,4 @@
 #endif
 
 void usr_rgblight_layers_init(void);
+// void usr_rgblight_layers_update_colors(void);  // DEBUG: Function disabled - causes red LED bug

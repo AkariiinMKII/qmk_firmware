@@ -8,20 +8,21 @@
 #include "quantum.h"
 
 // Dim color selection index (for VIA configuration)
+// Index 0 reserved for EEPROM reset detection
 enum dim_color_index {
-    DIM_COLOR_RED = 0,
-    DIM_COLOR_ORANGE = 1,
-    DIM_COLOR_YELLOW = 2,
-    DIM_COLOR_LIME = 3,
-    DIM_COLOR_GREEN = 4,
-    DIM_COLOR_TEAL = 5,
-    DIM_COLOR_CYAN = 6,
-    DIM_COLOR_AZURE = 7,
-    DIM_COLOR_BLUE = 8,
-    DIM_COLOR_PURPLE = 9,
-    DIM_COLOR_MAGENTA = 10,
-    DIM_COLOR_ROSE = 11,
-    DIM_COLOR_WHITE = 12
+    DIM_COLOR_RED = 1,
+    DIM_COLOR_ORANGE = 2,
+    DIM_COLOR_YELLOW = 3,
+    DIM_COLOR_LIME = 4,
+    DIM_COLOR_GREEN = 5,
+    DIM_COLOR_TEAL = 6,
+    DIM_COLOR_CYAN = 7,
+    DIM_COLOR_AZURE = 8,
+    DIM_COLOR_BLUE = 9,
+    DIM_COLOR_PURPLE = 10,
+    DIM_COLOR_MAGENTA = 11,
+    DIM_COLOR_ROSE = 12,
+    DIM_COLOR_WHITE = 13
 };
 
 // Brightness levels
