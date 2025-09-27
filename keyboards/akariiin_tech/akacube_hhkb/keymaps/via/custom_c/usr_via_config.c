@@ -10,10 +10,6 @@
 // Compile-time check to ensure EEPROM user data space is sufficient
 _Static_assert(8 <= EECONFIG_USER_DATA_SIZE, "EEPROM user data size too small for configuration");
 
-// Magic marker to detect if EEPROM has been initialized
-// Using keyboard-specific EEPROM space (eeconfig_read_kb)
-#define EEPROM_MAGIC_MARKER 0xAC8BAC8B  // "AkaCube" inspired 32-bit marker
-
 // VIA Configuration Channel IDs
 enum via_config_channels {
     LOCK_LED_CONFIG_CHANNEL = 0  // Use custom channel
@@ -49,21 +45,22 @@ enum lock_led_types {
 // Configuration initialization flag
 static bool config_loaded = false;
 
-// Runtime configuration storage - 4x3 matrix for all config
-// Rows 0-2: Lock LED config [mask, color_off, color_on]
-// Row 3: Misc config [timeout|flag, layer_off, layer_on] where first element packs timeout(7bits)+flag(1bit)
+// Configuration matrix [4x3]:
+//      | col 0       | col 1      | col 2
+// -----+-------------+------------+----------
+// row 0| lock0_mask  | color_off  | color_on
+// row 1| lock1_mask  | color_off  | color_on
+// row 2| lock2_mask  | color_off  | color_on
+// row 3| timeout|flag| layer_off  | layer_on
+//
+// Lock mask: 0=off 1=num 2=caps 4=scroll 8=compose 16=kana
+// Colors: 1-13 (0=EEPROM reset), EEPROM: 8 bytes packed
 static uint8_t via_config[4][3] = {
-    {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 0: Lock LED 0
-    {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 1: Lock LED 1
-    {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},           // Row 2: Lock LED 2
-    {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}  // Row 3: Misc config
+    {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},
+    {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},
+    {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},
+    {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}
 };
-
-// 64-bit user datablock storage layout (8 bytes)
-// Bytes 0-1: Lock LED 0 - (led_mask:8, off_color:4, on_color:4)
-// Bytes 2-3: Lock LED 1 - (led_mask:8, off_color:4, on_color:4)
-// Bytes 4-5: Lock LED 2 - (led_mask:8, off_color:4, on_color:4)
-// Bytes 6-7: Misc config (layer_off:4, layer_on:4, timeout:7, flag:1)
 
 // Validation functions
 static bool is_valid_lock_led_value(uint8_t value) {
@@ -75,19 +72,23 @@ static bool is_valid_timeout_value(uint8_t value) {
 }
 
 static bool is_valid_color_index(uint8_t value) {
-    return (value <= DIM_COLOR_WHITE);  // 0-12 are valid, 4-bit storage allows 0-15
+    return (value >= 1 && value <= 13);
+}
+
+static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
+    return (row <= 3 && col <= 2);
 }
 
 // Data packing/unpacking functions
+// 64-bit EEPROM: [63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
+// 16-bit pack: [15:12 color_on][11:8 color_off][7:0 config/timeout]
 static uint16_t pack_matrix_row(uint8_t row_index) {
-    // All rows use same packing: (col0:8, col1:4, col2:4)
-    return (uint16_t)via_config[row_index][0] |                           // bits 0-7: column 0
-           ((uint16_t)(via_config[row_index][1] & 0xF) << 8) |           // bits 8-11: column 1
-           ((uint16_t)(via_config[row_index][2] & 0xF) << 12);           // bits 12-15: column 2
+    return (uint16_t)via_config[row_index][0] |
+           ((uint16_t)(via_config[row_index][1] & 0xF) << 8) |
+           ((uint16_t)(via_config[row_index][2] & 0xF) << 12);
 }
 
 static void unpack_matrix_row(uint16_t packed, uint8_t row_index) {
-    // All rows use same unpacking: (col0:8, col1:4, col2:4)
     via_config[row_index][0] = (uint8_t)(packed & 0xFF);
     via_config[row_index][1] = (uint8_t)((packed >> 8) & 0xF);
     via_config[row_index][2] = (uint8_t)((packed >> 12) & 0xF);
@@ -111,6 +112,7 @@ static uint8_t merge_mixed_flag(uint8_t new_flag) {
     uint8_t timeout = pick_mixed_time();
     return (timeout & 0x7F) | ((new_flag & 0x1) << 7);
 }
+
 // EEPROM I/O functions
 static void eeload_all_config(void) {
     uint8_t config[8];
@@ -134,7 +136,7 @@ static void eesave_all_config(void) {
 }
 
 static void eesave_config_matrix_row(uint8_t row_index) {
-    if (row_index > 3) return;
+    if (!is_valid_config_matrix(row_index, 0)) return;
 
     uint16_t packed = pack_matrix_row(row_index);
     uint8_t offset = row_index * 2;
@@ -145,11 +147,10 @@ static void eesave_config_matrix_row(uint8_t row_index) {
     eeconfig_update_user_datablock(data, offset, 2);
 }
 
-
 // Core configuration functions
 static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_value) {
     // Validate parameters
-    if (row_index > 3 || col_index > 2) {
+    if (!is_valid_config_matrix(row_index, col_index)) {
         return false;
     }
 
@@ -187,7 +188,6 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 void usr_via_config_init(void) {
     if (config_loaded) return;
 
-    // Define default configuration
     static const uint8_t default_config[4][3] = {
         {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 0
         {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 1
@@ -195,20 +195,8 @@ void usr_via_config_init(void) {
         {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}  // Misc: timeout|flag, layer_off, layer_on
     };
 
-    // Check if EEPROM was reset
-    if (eeconfig_read_kb() != EEPROM_MAGIC_MARKER) {
-        // EEPROM was reset - apply defaults and save
-        memcpy(via_config, default_config, sizeof(via_config));
-        eesave_all_config();
-        eeconfig_update_kb(EEPROM_MAGIC_MARKER);
-        config_loaded = true;
-        usr_refresh_indicator();
-        return;
-    }
-
-    // Normal initialization - load from EEPROM
     eeload_all_config();
-    
+
     // Validate loaded config per-row (handles corrupted data)
     for (uint8_t row = 0; row < 4; row++) {
         bool should_reset_row = false;
@@ -239,7 +227,8 @@ void usr_via_config_init(void) {
     config_loaded = true;
 
     // Update RGB layers with current colors
-    // usr_rgblight_layers_update_colors(); // TODO: Commented for debug - function removed
+    // DEBUG: Uncommenting this call to investigate red LED bug
+    // usr_rgblight_layers_update_colors(); // TODO: Function exists but disabled internally for debug
     usr_refresh_indicator();
 }
 
@@ -249,7 +238,7 @@ void usr_via_config_save(void) {
 
 // Public API functions
 uint8_t usr_via_get_config(uint8_t row, uint8_t col) {
-    if (row > 3 || col > 2 || (row == 3 && col == 0)) return 0;
+    if (!is_valid_config_matrix(row, col) || (row == 3 && col == 0)) return 0;
     return via_config[row][col];
 }
 uint8_t usr_via_get_lock_timeout(void) { return pick_mixed_time(); }
@@ -363,7 +352,8 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         return;
                 }
                 if (should_update_leds) {
-                    // usr_rgblight_layers_update_colors(); // TODO: Commented for debug - function removed
+                    // DEBUG: Uncommenting this call to investigate red LED bug
+                    // usr_rgblight_layers_update_colors(); // TODO: Function exists but disabled internally for debug
                     usr_refresh_indicator();
                 }
                 break;
