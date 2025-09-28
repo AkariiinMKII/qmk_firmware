@@ -138,7 +138,7 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
         }
     }
 
-    // If we reach here, it's neither a modifier nor a combo key
+    // Handle non-combo keys
     return true;  // Allow non-combo-related keys through
 }
 
