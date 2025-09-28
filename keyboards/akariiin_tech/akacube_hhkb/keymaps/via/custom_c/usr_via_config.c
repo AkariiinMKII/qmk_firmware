@@ -200,7 +200,7 @@ void usr_via_config_init(void) {
     // Validate loaded config per-row (handles corrupted data)
     for (uint8_t row = 0; row < 4; row++) {
         bool should_reset_row = false;
-        
+
         if (row < 3) {
             // Validate LED row
             if (!is_valid_lock_led_value(via_config[row][0]) ||
@@ -216,7 +216,7 @@ void usr_via_config_init(void) {
                 should_reset_row = true;
             }
         }
-        
+
         if (should_reset_row) {
             // Reset only this row to defaults
             memcpy(via_config[row], default_config[row], 3);
@@ -226,9 +226,6 @@ void usr_via_config_init(void) {
 
     config_loaded = true;
 
-    // Update RGB layers with current colors
-    // DEBUG: Uncommenting this call to investigate red LED bug
-    // usr_rgblight_layers_update_colors(); // TODO: Function exists but disabled internally for debug
     usr_refresh_indicator();
 }
 
@@ -352,8 +349,6 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         return;
                 }
                 if (should_update_leds) {
-                    // DEBUG: Uncommenting this call to investigate red LED bug
-                    // usr_rgblight_layers_update_colors(); // TODO: Function exists but disabled internally for debug
                     usr_refresh_indicator();
                 }
                 break;
@@ -369,6 +364,6 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
         return; // Command handled successfully
     }
 
-    // If we get here, the channel is not ours - mark as unhandled
+    // Unknown channel - mark as unhandled
     *command_id = id_unhandled;
 }
