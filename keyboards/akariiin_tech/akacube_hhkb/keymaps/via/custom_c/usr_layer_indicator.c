@@ -3,7 +3,7 @@
 
 #include "usr_layer_indicator.h"
 
-// Show layer indicators with bit checks - using hardcoded indices
+// Show layer indicators with bit checks
 void layer_indicator_show(layer_state_t state) {
     rgblight_set_layer_state(0, state > 1);         // RGB layer 0: Layer background
     rgblight_set_layer_state(1, (state & 2) > 0);   // RGB layer 1: Layer 1 indicator (bit 1)

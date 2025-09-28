@@ -6,7 +6,7 @@
 #include "usr_lock_indicator.h"
 #include "usr_via_config.h"
 
-// Lock state management - moved from usr_lock_indicator.c  
+// Lock state management
 // Single bitmask cache for all lock states
 static uint8_t lock_last_state = 0;
 
@@ -21,8 +21,8 @@ static bool lockled_timeouted = false;
 // Update lock indicators when state changes
 void lock_indicator_update(led_t led_state) {
     if (!usr_via_lock_system_enabled()) return;
-    
-    // Get current lock state bitmask for enabled LEDs - using hardcoded indices
+
+    // Get current lock state bitmask for enabled LEDs
     uint8_t lock_current_state = led_state.raw & (usr_via_get_config(0, 0) | usr_via_get_config(1, 0) | usr_via_get_config(2, 0));
 
     // Only update if state changed
@@ -49,7 +49,7 @@ void lock_indicator_update(led_t led_state) {
 // Handle lock indicator timeout - hide indicators after configured timeout
 void lock_indicator_timer(layer_state_t state) {
     if (!usr_via_lock_system_enabled()) return;
-    
+
     if (lockled_active && timer_elapsed(lockled_timer) >= (usr_via_get_lock_timeout() * 100)) {
         lockled_active = false;
         lockled_timer = 0;

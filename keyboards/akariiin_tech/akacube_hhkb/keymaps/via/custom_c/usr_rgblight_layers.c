@@ -5,8 +5,6 @@
 #include "usr_via_config.h"
 #include "usr_rgb_colors.h"
 
-// Function to get HSV dim color directly from VIA config
-
 // RGB Layer Definitions (ordered by priority: lowest → highest)
 
 // 1. Layer LED background layer (lowest priority - overrides default animations)
@@ -111,39 +109,3 @@ void usr_rgblight_layers_init(void) {
     rgblight_set_layer_state(12, false);  // Blink background off
     rgblight_set_layer_state(13, false);  // Blink color off
 }
-
-// Dynamic color update function - Updates RGB layer colors based on VIA configuration
-// DEBUG: This function was previously causing all LEDs to turn red - investigate color mapping
-// void usr_rgblight_layers_update_colors(void) {
-//     // DEBUG: Function disabled due to causing red LED bug
-//     // TODO: Investigate why this function causes all LEDs to turn red instead of using VIA colors
-//     
-//     // ORIGINAL INTENDED BEHAVIOR:
-//     // - Read color indices from VIA config (usr_via_get_config)
-//     // - Convert color indices to HSV values using get_via_color_hsv
-//     // - Update rgblight layer segment colors dynamically
-//     // - Refresh RGB layers to show new colors
-//     
-//     // DEBUG NOTES:
-//     // - Static const arrays in usr_rgblight_layers work correctly
-//     // - Dynamic color updates seem to cause color corruption
-//     // - Issue likely in color conversion or layer segment modification
-//     // - Consider if rgblight_segment_t can be modified at runtime
-//     
-//     // PLACEHOLDER: Function body commented out to prevent red LED bug
-//     
-//     HSV layer_color_off = get_via_color_hsv(usr_via_get_config(3, 1));
-//     HSV layer_color_on = get_via_color_hsv(usr_via_get_config(3, 2));
-//     
-//     HSV lock_color_off[3];
-//     HSV lock_color_on[3];
-//     
-//     for (uint8_t i = 0; i < 3; i++) {
-//         lock_color_off[i] = get_via_color_hsv(usr_via_get_config(i, 1));
-//         lock_color_on[i] = get_via_color_hsv(usr_via_get_config(i, 2));
-//     }
-//     
-//     // TODO: Implement safe dynamic color updates
-//     // TODO: Investigate if rgblight_segment_t arrays can be modified at runtime
-//     // TODO: Consider alternative approach using rgblight_set_layer_color or similar
-// }

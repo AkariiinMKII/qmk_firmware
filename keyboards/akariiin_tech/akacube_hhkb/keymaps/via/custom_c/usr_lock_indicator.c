@@ -25,7 +25,7 @@ void lock_indicator_show(uint8_t lock_state) {
     rgblight_set_layer_state(11, (lock_state & led2) > 0);  // RGB layer 11: Lock 2 indicator
 }
 
-// Hide all lock indicators - using hardcoded indices
+// Hide all lock indicators
 void lock_indicator_hide(void) {
     // All lock LED layers
     rgblight_set_layer_state(5, false);   // RGB layer 5: All-black background

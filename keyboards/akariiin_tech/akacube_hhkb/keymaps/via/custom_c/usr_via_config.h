@@ -41,7 +41,7 @@ bool usr_via_get_layerkey_show_lockled(void);
 // Helper functions
 bool usr_via_lock_system_enabled(void);
 
-// Callback for when config changes (implemented in usr_led_control.c)
+// Callback for when config changes
 void usr_refresh_indicator(void);
 
 // VIA command handler
