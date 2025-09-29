@@ -7,24 +7,6 @@
 
 #include "quantum.h"
 
-// Dim color selection index (for VIA configuration)
-enum dim_color_index {
-    // Index 0 reserved for EEPROM reset detection
-    DIM_RED = 1,
-    DIM_ORANGE = 2,
-    DIM_YELLOW = 3,
-    DIM_LIME = 4,
-    DIM_GREEN = 5,
-    DIM_TEAL = 6,
-    DIM_CYAN = 7,
-    DIM_AZURE = 8,
-    DIM_BLUE = 9,
-    DIM_PURPLE = 10,
-    DIM_MAGENTA = 11,
-    DIM_ROSE = 12,
-    DIM_WHITE = 13
-};
-
 // Brightness levels
 #define HSV_VAL_DIM      96   // Dimmed brightness level
 #define HSV_VAL_BRIGHT   192  // Bright brightness level
