@@ -7,3 +7,4 @@
 #include "usr_config.h"
 
 void layer_indicator_show(layer_state_t state);
+void layer_indicator_hide(void);

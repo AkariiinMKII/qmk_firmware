@@ -90,22 +90,22 @@ void usr_rgblight_layers_init(void) {
 
     // Initialize all layers to known states (all off)
     // Layer indicators
-    rgblight_set_layer_state(0, false);   // Layer background off
-    rgblight_set_layer_state(1, false);   // Layer 1 off
-    rgblight_set_layer_state(2, false);   // Layer 2 off
-    rgblight_set_layer_state(3, false);   // Layer 3 off
-    rgblight_set_layer_state(4, false);   // Layer 4 off
+    rgblight_set_layer_state(0, false);
+    rgblight_set_layer_state(1, false);
+    rgblight_set_layer_state(2, false);
+    rgblight_set_layer_state(3, false);
+    rgblight_set_layer_state(4, false);
 
     // Lock LED layers
-    rgblight_set_layer_state(5, false);   // All-black lock background off
-    rgblight_set_layer_state(6, false);   // Lock 0 color background off
-    rgblight_set_layer_state(7, false);   // Lock 1 color background off
-    rgblight_set_layer_state(8, false);   // Lock 2 color background off
-    rgblight_set_layer_state(9, false);   // Lock 0 indicator off
-    rgblight_set_layer_state(10, false);  // Lock 1 indicator off
-    rgblight_set_layer_state(11, false);  // Lock 2 indicator off
+    rgblight_set_layer_state(5, false);
+    rgblight_set_layer_state(6, false);
+    rgblight_set_layer_state(7, false);
+    rgblight_set_layer_state(8, false);
+    rgblight_set_layer_state(9, false);
+    rgblight_set_layer_state(10, false);
+    rgblight_set_layer_state(11, false);
 
     // Blink layers
-    rgblight_set_layer_state(12, false);  // Blink background off
-    rgblight_set_layer_state(13, false);  // Blink color off
+    rgblight_set_layer_state(12, false);
+    rgblight_set_layer_state(13, false);
 }

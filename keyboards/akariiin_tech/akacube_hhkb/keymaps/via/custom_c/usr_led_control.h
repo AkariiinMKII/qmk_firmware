@@ -21,6 +21,7 @@
 #endif
 
 void lock_indicator_update(led_t led_state);
-void lock_indicator_timer(layer_state_t state);
+void lock_indicator_timer(void);
 void layer_indicator_update(layer_state_t state);
-void usr_refresh_indicator(void);
+void usr_refresh_lockled(void);
+void usr_refresh_layerled(uint8_t flag);

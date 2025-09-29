@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "usr_via_config.h"
-#include "usr_led_control.h"
-#include "usr_rgb_colors.h"
-#include "usr_rgblight_layers.h"
+#include "usr_config.h"
 #include "eeconfig.h"
 
 // Compile-time check to ensure EEPROM user data space is sufficient
@@ -32,16 +30,6 @@ enum lock_led_config_ids {
     LAYERKEY_SHOW_LOCKLED_CONFIG = 12
 };
 
-// Lock LED type values (must match VIA UI)
-enum lock_led_types {
-    LOCK_TYPE_DISABLE = 0,
-    LOCK_TYPE_NUMLOCK = 1,
-    LOCK_TYPE_CAPSLOCK = 2,
-    LOCK_TYPE_SCROLLLOCK = 4,
-    LOCK_TYPE_COMPOSE = 8,
-    LOCK_TYPE_KANA = 16
-};
-
 // Configuration initialization flag
 static bool config_loaded = false;
 
@@ -53,14 +41,9 @@ static bool config_loaded = false;
 // row 2| lock2_mask  | color_off  | color_on
 // row 3| timeout|flag| layer_off  | layer_on
 //
-// Lock mask: 0=off 1=num 2=caps 4=scroll 8=compose 16=kana
+// Lock mask: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
 // Colors: 1-13 (0=EEPROM reset), EEPROM: 8 bytes packed
-static uint8_t via_config[4][3] = {
-    {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},
-    {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},
-    {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},
-    {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}
-};
+static uint8_t via_config[4][3];
 
 // Validation functions
 static bool is_valid_lock_led_value(uint8_t value) {
@@ -189,10 +172,10 @@ void usr_via_config_init(void) {
     if (config_loaded) return;
 
     static const uint8_t default_config[4][3] = {
-        {USR_LOCKLED_0, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 0
-        {USR_LOCKLED_1, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 1
-        {USR_LOCKLED_2, DIM_COLOR_RED, DIM_COLOR_GREEN},           // LED 2
-        {(USR_LOCKLED_KEEPTIME / 100), DIM_COLOR_RED, DIM_COLOR_BLUE}  // Misc: timeout|flag, layer_off, layer_on
+        {USR_LOCKLED_0, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
+        {USR_LOCKLED_1, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
+        {USR_LOCKLED_2, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
+        {(USR_LOCKLED_KEEPTIME / 100), 1, 7}  // 1: DIM_RED, 7: DIM_BLUE
     };
 
     eeload_all_config();
@@ -226,7 +209,8 @@ void usr_via_config_init(void) {
 
     config_loaded = true;
 
-    usr_refresh_indicator();
+    usr_refresh_lockled();
+    usr_refresh_layerled(pick_mixed_flag());
 }
 
 void usr_via_config_save(void) {
@@ -303,54 +287,55 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                 break;
             }
             case id_custom_set_value: {
-                bool should_update_leds = false;
+                bool should_update_lockled = false;
+                bool should_update_layerled = false;
                 switch (*value_id) {
                     case LOCK_LED_0_CONFIG:
-                        should_update_leds = via_update_config(0, 0, value_data[0]);
+                        should_update_lockled = via_update_config(0, 0, value_data[0]);
                         break;
                     case LOCK_LED_0_COLOR_OFF:
-                        should_update_leds = via_update_config(0, 1, value_data[0]);
+                        should_update_lockled = via_update_config(0, 1, value_data[0]);
                         break;
                     case LOCK_LED_0_COLOR_ON:
-                        should_update_leds = via_update_config(0, 2, value_data[0]);
+                        should_update_lockled = via_update_config(0, 2, value_data[0]);
                         break;
                     case LOCK_LED_1_CONFIG:
-                        should_update_leds = via_update_config(1, 0, value_data[0]);
+                        should_update_lockled = via_update_config(1, 0, value_data[0]);
                         break;
                     case LOCK_LED_1_COLOR_OFF:
-                        should_update_leds = via_update_config(1, 1, value_data[0]);
+                        should_update_lockled = via_update_config(1, 1, value_data[0]);
                         break;
                     case LOCK_LED_1_COLOR_ON:
-                        should_update_leds = via_update_config(1, 2, value_data[0]);
+                        should_update_lockled = via_update_config(1, 2, value_data[0]);
                         break;
                     case LOCK_LED_2_CONFIG:
-                        should_update_leds = via_update_config(2, 0, value_data[0]);
+                        should_update_lockled = via_update_config(2, 0, value_data[0]);
                         break;
                     case LOCK_LED_2_COLOR_OFF:
-                        should_update_leds = via_update_config(2, 1, value_data[0]);
+                        should_update_lockled = via_update_config(2, 1, value_data[0]);
                         break;
                     case LOCK_LED_2_COLOR_ON:
-                        should_update_leds = via_update_config(2, 2, value_data[0]);
+                        should_update_lockled = via_update_config(2, 2, value_data[0]);
                         break;
                     case LAYER_LED_COLOR_OFF:
-                        should_update_leds = via_update_config(3, 1, value_data[0]);
+                        should_update_layerled = via_update_config(3, 1, value_data[0]);
                         break;
                     case LAYER_LED_COLOR_ON:
-                        should_update_leds = via_update_config(3, 2, value_data[0]);
+                        should_update_layerled = via_update_config(3, 2, value_data[0]);
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
                         via_update_config(3, 0, merge_mixed_time(value_data[0]));
                         break;
                     case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        should_update_leds = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
+                        should_update_layerled = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
                         break;
                     default:
                         *command_id = id_unhandled;
                         return;
                 }
-                if (should_update_leds) {
-                    usr_refresh_indicator();
-                }
+
+                if (should_update_lockled) { usr_refresh_lockled(); }
+                if (should_update_layerled) { usr_refresh_layerled(pick_mixed_flag()); }
                 break;
             }
             case id_custom_save: {

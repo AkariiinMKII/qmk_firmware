@@ -6,113 +6,102 @@
 #include "usr_lock_indicator.h"
 #include "usr_via_config.h"
 
-// Lock state management
-// Single bitmask cache for all lock states
+// Lock LED state variables
 static uint8_t lock_last_state = 0;
-
 static bool lockled_active = false;
 static uint16_t lockled_timer = 0;
 
-// Flag to indicate lock indicator timeout occurred (used in normal mode)
-static bool lockled_timeouted = false;
+// Layer LED state variables
+static layer_state_t layer_last_state = 0;
 
-// Lock LED Functions
+// Start timer
+static void lock_indicator_timer_start(void) {
+    lockled_active = true;
+    lockled_timer = timer_read();
+}
 
-// Update lock indicators when state changes
+// Reset timer variables
+static void lock_indicator_timer_reset(void) {
+    lockled_active = false;
+    lockled_timer = 0;
+}
+
+// Update lock indicators
 void lock_indicator_update(led_t led_state) {
     if (!usr_via_lock_system_enabled()) return;
 
-    // Get current lock state bitmask for enabled LEDs
-    uint8_t lock_current_state = led_state.raw & (usr_via_get_config(0, 0) | usr_via_get_config(1, 0) | usr_via_get_config(2, 0));
+    // Get current lock state for enabled LEDs
+    uint8_t lock_current_mask = usr_via_get_config(LOCK_LED_0, BITMASK) |
+                               usr_via_get_config(LOCK_LED_1, BITMASK) |
+                               usr_via_get_config(LOCK_LED_2, BITMASK);
+    uint8_t lock_current_state = led_state.raw & lock_current_mask;
 
     // Only update if state changed
     if (lock_current_state != lock_last_state) {
         lock_last_state = lock_current_state;
-        if (usr_via_get_layerkey_show_lockled()) {
-            // Only start timer when on base layer (not when layer key is held)
-            if (layer_state > 1) {
-                lockled_active = false;  // Disable timer while layer active
-                lockled_timer = 0;
-            } else {
-                lockled_active = true;   // Start timer on base layer
-                lockled_timer = timer_read();
-            }
+        // Handle lock indicators override
+        if (layer_state > 1 && usr_via_get_layerkey_show_lockled()) {
+            lock_indicator_timer_reset();  // Disable timer on upper layer for indicator override
         } else {
-            // Normal mode: always start timer when lock state changes
-            lockled_active = true;
-            lockled_timer = timer_read();
+            lock_indicator_timer_start();  // Otherwise start timer
         }
         lock_indicator_show(lock_last_state);
     }
 }
 
-// Handle lock indicator timeout - hide indicators after configured timeout
-void lock_indicator_timer(layer_state_t state) {
-    if (!usr_via_lock_system_enabled()) return;
-
+// Handle lock indicator timeout
+void lock_indicator_timer(void) {
     if (lockled_active && timer_elapsed(lockled_timer) >= (usr_via_get_lock_timeout() * 100)) {
-        lockled_active = false;
-        lockled_timer = 0;
+        lock_indicator_timer_reset();
         lock_indicator_hide();
-
-        if (!usr_via_get_layerkey_show_lockled()) {
-            // Set flag to trigger layer update in normal mode
-            lockled_timeouted = true;
-        }
     }
 }
-
-// Layer LED Functions
-
-// Cached layer state for comparison
-static layer_state_t layer_last_state = 0;
 
 // Update layer indicators
 void layer_indicator_update(layer_state_t state) {
-    if (usr_via_lock_system_enabled()) {
-        if (usr_via_get_layerkey_show_lockled()) {
-            if (state != layer_last_state) {
-                layer_last_state = state;
-                if (state > 1) {
-                    // Layer key held: disable timer, keep indicators on indefinitely
-                    lockled_active = false;
-                    lockled_timer = 0;
-                } else {
-                    // Layer key released: start fresh timer for full timeout period
-                    lockled_active = true;
-                    lockled_timer = timer_read();
-                }
-                // Always show lock indicators
-                lock_indicator_show(lock_last_state);
+    if (state != layer_last_state) {
+        layer_last_state = state;  // Keep layer state cache up to date
+
+        // Handle lock indicators override
+        if (usr_via_lock_system_enabled() && usr_via_get_layerkey_show_lockled()) {
+            if (state > 1) {
+                // Layer key down: show lock indicators without timeout
+                lock_indicator_timer_reset();
+            } else {
+                // Layer key up: continue lock indicators for period of timeout
+                lock_indicator_timer_start();
             }
-        } else {
-            // Normal mode: use timeout flag to trigger updates after timer expires
-            if (state != layer_last_state || lockled_timeouted) {
-                lockled_timeouted = false;  // Clear timeout flag
-                layer_last_state = state;
-                layer_indicator_show(state);       // Show layer indicators
-            }
+            lock_indicator_show(lock_last_state);
         }
-    } else {
-        // No locks enabled: always show layer indicators
-        if (state != layer_last_state) {
-            layer_last_state = state;
-            layer_indicator_show(state);
-        }
+        // Update layer indicators even if in background
+        layer_indicator_show(layer_last_state);
     }
 }
 
-// Refresh all indicators (called when VIA configuration changes)
-void usr_refresh_indicator(void) {
+// Refresh indicators on config change
+void usr_refresh_lockled(void) {
+    lock_indicator_timer_reset();
     if (usr_via_lock_system_enabled()) {
-        // Reset lock system state when configuration changes
-        lockled_active = false;
-        lockled_timer = 0;
+        lock_last_state = 0xFF; // Force trigger update
+        lock_indicator_update(host_keyboard_led_state());
+    } else {
         lock_last_state = 0;
-        lockled_timeouted = false;
-        // Hide all current indicators
         lock_indicator_hide();
+        layer_last_state = layer_state;
+        layer_indicator_show(layer_last_state);
     }
-    // Reset layer state cache to force refresh in next scan
-    layer_last_state = 0;
+}
+
+void usr_refresh_layerled(uint8_t flag) {
+    layer_indicator_hide();
+    if (flag && layer_state > 1 && usr_via_lock_system_enabled()) {
+        usr_refresh_lockled();
+    } else {
+        if (!lockled_active) {
+            lock_indicator_timer_reset();
+            lock_indicator_hide();
+        }
+        layer_last_state = layer_state;
+        layer_indicator_show(layer_last_state);
+    }
 }

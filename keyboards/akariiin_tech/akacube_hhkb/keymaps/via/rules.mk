@@ -15,6 +15,7 @@ VIA_ENABLE = yes             # VIA keymap configuration support
 WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling
 
 # ------------------ User Space Source Files ------------------
+SRC += custom_c/usr_rgb_colors.c      # RGB color definitions
 SRC += custom_c/usr_rgblight_layers.c # RGB light layer management
 SRC += custom_c/usr_led_control.c     # LED control coordination
 SRC += custom_c/usr_layer_indicator.c # Layer indicator system library
