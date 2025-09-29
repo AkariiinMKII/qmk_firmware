@@ -38,11 +38,11 @@ bool usr_combo_any_active(void);
 
 // Lock LED mapping configuration
 // - Hardware positions: USR_LOCKLED_0=LED 0-1 (left), USR_LOCKLED_1=LED 3-4 (middle), USR_LOCKLED_2=LED 6-7 (right)
-// - Available values: numlock, capslock, scrolllock, compose, kana, disable
-// - Setting all LOCKLEDs to 'disable' will disable the entire lock indicator system and force enable layer indicators
-#define USR_LOCKLED_0 numlock
-#define USR_LOCKLED_1 capslock
-#define USR_LOCKLED_2 scrolllock
+// - Available values: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
+// - Setting all LOCKLEDs to 0 will disable the entire lock indicator system and force enable layer indicators
+#define USR_LOCKLED_0 1  // numlock
+#define USR_LOCKLED_1 2  // capslock
+#define USR_LOCKLED_2 4  // scrolllock
 
 // Lock LED timeout
 // - Time to keep lock indicators on after lock state changes (ms)

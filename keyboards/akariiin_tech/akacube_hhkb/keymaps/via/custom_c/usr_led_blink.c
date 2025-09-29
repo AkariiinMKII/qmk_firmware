@@ -3,7 +3,7 @@
 
 #include "usr_led_blink.h"
 
-// Blink state management
+// Blink timing and state
 static bool blink_active = false;
 static bool blink_led_on = false;
 static uint16_t blink_timer = 0;
@@ -15,8 +15,8 @@ void led_blink_show(void) {
         blink_led_on = true;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(12, true);  // Background layer initial
-        rgblight_set_layer_state(13, true);  // Color layer initial
+        rgblight_set_layer_state(12, true);  // Background layer
+        rgblight_set_layer_state(13, true);  // Color layer
     }
 }
 
