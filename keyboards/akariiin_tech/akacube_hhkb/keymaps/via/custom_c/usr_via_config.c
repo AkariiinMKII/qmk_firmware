@@ -172,10 +172,10 @@ void usr_via_config_init(void) {
     if (config_loaded) return;
 
     static const uint8_t default_config[4][3] = {
-        {USR_LOCKLED_0, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
-        {USR_LOCKLED_1, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
-        {USR_LOCKLED_2, 1, 3},  // 1: DIM_RED, 3: DIM_GREEN
-        {(USR_LOCKLED_KEEPTIME / 100), 1, 7}  // 1: DIM_RED, 7: DIM_BLUE
+        {USR_LOCKLED_0, 1, 5},  // 1: Red, 5: Green
+        {USR_LOCKLED_1, 1, 5},  // 1: Red, 5: Green
+        {USR_LOCKLED_2, 1, 5},  // 1: Red, 5: Green
+        {(USR_LOCKLED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
     };
 
     eeload_all_config();
