@@ -62,6 +62,27 @@ static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
     return (row <= 3 && col <= 2);
 }
 
+static bool is_valid_default_layer(uint32_t mask) {
+    return (mask == 1 || mask == 2 || mask == 4 || mask == 8);
+}
+
+// Get default layer from EEPROM or keymap
+static void eerestore_default_layer(void) {
+    uint32_t load_default_layer = 1;  // Initialize with fallback layer 0
+
+    uint8_t eeload_default_layer_shift = get_highest_layer(eeconfig_read_default_layer());
+    uint32_t eeload_default_layer = (1UL << eeload_default_layer_shift);
+
+    if (is_valid_default_layer(eeload_default_layer)) {
+        load_default_layer = eeload_default_layer;  // Valid default layer from EEPROM
+    } else if (is_valid_default_layer(default_layer_state)) {
+        load_default_layer = default_layer_state;  // Valid default layer from keymap
+    }
+
+    default_layer_set(load_default_layer);
+    layer_state_set(default_layer_state); // Workaround to ensure layer state is set
+}
+
 // Data packing/unpacking functions
 // 64-bit EEPROM: [63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
 // 16-bit pack: [15:12 color_on][11:8 color_off][7:0 config/timeout]
@@ -175,7 +196,7 @@ void usr_via_config_init(void) {
         {USR_LOCKLED_0, 1, 5},  // 1: Red, 5: Green
         {USR_LOCKLED_1, 1, 5},  // 1: Red, 5: Green
         {USR_LOCKLED_2, 1, 5},  // 1: Red, 5: Green
-        {(USR_LOCKLED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
+        {(USR_LED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
     };
 
     eeload_all_config();
@@ -209,8 +230,10 @@ void usr_via_config_init(void) {
 
     config_loaded = true;
 
+    eerestore_default_layer();
+
     usr_refresh_lockled();
-    usr_refresh_layerled(pick_mixed_flag());
+    usr_refresh_layerled();
 }
 
 void usr_via_config_save(void) {
@@ -222,8 +245,14 @@ uint8_t usr_via_get_config(uint8_t row, uint8_t col) {
     if (!is_valid_config_matrix(row, col) || (row == 3 && col == 0)) return 0;
     return via_config[row][col];
 }
-uint8_t usr_via_get_lock_timeout(void) { return pick_mixed_time(); }
-bool usr_via_get_layerkey_show_lockled(void) { return pick_mixed_flag() != 0; }
+
+uint8_t usr_via_get_led_timeout(void) {
+    return pick_mixed_time();
+}
+
+bool usr_via_get_layerkey_show_lockled(void) {
+    return pick_mixed_flag() != 0;
+}
 
 bool usr_via_lock_system_enabled(void) {
     return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
@@ -335,7 +364,7 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                 }
 
                 if (should_update_lockled) { usr_refresh_lockled(); }
-                if (should_update_layerled) { usr_refresh_layerled(pick_mixed_flag()); }
+                if (should_update_layerled) { usr_refresh_layerled(); }
                 break;
             }
             case id_custom_save: {

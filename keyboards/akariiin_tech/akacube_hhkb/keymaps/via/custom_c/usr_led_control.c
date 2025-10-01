@@ -13,17 +13,43 @@ static uint16_t lockled_timer = 0;
 
 // Layer LED state variables
 static layer_state_t layer_last_state = 0;
+static bool layerled_active = false;
+static uint16_t layerled_timer = 0;
 
-// Start timer
+// Lock LED timer control functions
 static void lock_indicator_timer_start(void) {
     lockled_active = true;
     lockled_timer = timer_read();
 }
 
-// Reset timer variables
 static void lock_indicator_timer_reset(void) {
     lockled_active = false;
     lockled_timer = 0;
+}
+
+void lock_indicator_timer(void) {
+    if (timer_elapsed(lockled_timer) >= (usr_via_get_led_timeout() * 100)) {
+        lock_indicator_timer_reset();
+        lock_indicator_hide();
+    }
+}
+
+// Layer LED timer control functions
+static void layer_indicator_timer_start(void) {
+    layerled_active = true;
+    layerled_timer = timer_read();
+}
+
+static void layer_indicator_timer_reset(void) {
+    layerled_active = false;
+    layerled_timer = 0;
+}
+
+void layer_indicator_timer(void) {
+    if (timer_elapsed(layerled_timer) >= (usr_via_get_led_timeout() * 100)) {
+        layer_indicator_timer_reset();
+        layer_indicator_hide();
+    }
 }
 
 // Update lock indicators
@@ -40,20 +66,12 @@ void lock_indicator_update(led_t led_state) {
     if (lock_current_state != lock_last_state) {
         lock_last_state = lock_current_state;
         // Handle lock indicators override
-        if (layer_state > 1 && usr_via_get_layerkey_show_lockled()) {
+        if (layer_state != default_layer_state && usr_via_get_layerkey_show_lockled()) {
             lock_indicator_timer_reset();  // Disable timer on upper layer for indicator override
         } else {
             lock_indicator_timer_start();  // Otherwise start timer
         }
         lock_indicator_show(lock_last_state);
-    }
-}
-
-// Handle lock indicator timeout
-void lock_indicator_timer(void) {
-    if (lockled_active && timer_elapsed(lockled_timer) >= (usr_via_get_lock_timeout() * 100)) {
-        lock_indicator_timer_reset();
-        lock_indicator_hide();
     }
 }
 
@@ -64,7 +82,7 @@ void layer_indicator_update(layer_state_t state) {
 
         // Handle lock indicators override
         if (usr_via_lock_system_enabled() && usr_via_get_layerkey_show_lockled()) {
-            if (state > 1) {
+            if (state != default_layer_state) {
                 // Layer key down: show lock indicators without timeout
                 lock_indicator_timer_reset();
             } else {
@@ -74,6 +92,32 @@ void layer_indicator_update(layer_state_t state) {
             lock_indicator_show(lock_last_state);
         }
         // Update layer indicators even if in background
+        if (state != default_layer_state) {
+            layer_indicator_timer_reset();
+        } else {
+            layer_indicator_timer_start();
+        }
+        layer_indicator_show(layer_last_state);
+    }
+}
+
+// Switch active indicators
+static void switch_layerled_to_lockled(void) {
+    if (layerled_active) {
+        lockled_active = true;
+        lockled_timer = layerled_timer; // Transfer remaining time
+        layer_indicator_timer_reset();
+        layer_indicator_hide();
+        lock_indicator_show(lock_last_state);
+    }
+}
+
+static void switch_lockled_to_layerled(void) {
+    if (lockled_active) {
+        layerled_active = true;
+        layerled_timer = lockled_timer; // Transfer remaining time
+        lock_indicator_timer_reset();
+        lock_indicator_hide();
         layer_indicator_show(layer_last_state);
     }
 }
@@ -81,27 +125,35 @@ void layer_indicator_update(layer_state_t state) {
 // Refresh indicators on config change
 void usr_refresh_lockled(void) {
     lock_indicator_timer_reset();
+
     if (usr_via_lock_system_enabled()) {
         lock_last_state = 0xFF; // Force trigger update
         lock_indicator_update(host_keyboard_led_state());
     } else {
         lock_last_state = 0;
         lock_indicator_hide();
-        layer_last_state = layer_state;
-        layer_indicator_show(layer_last_state);
     }
 }
 
-void usr_refresh_layerled(uint8_t flag) {
-    layer_indicator_hide();
-    if (flag && layer_state > 1 && usr_via_lock_system_enabled()) {
-        usr_refresh_lockled();
-    } else {
-        if (!lockled_active) {
+void usr_refresh_layerled(void) {
+    if (layer_state != default_layer_state) {
+        if (usr_via_get_layerkey_show_lockled() && usr_via_lock_system_enabled()) {
+            usr_refresh_lockled();
+        } else {
             lock_indicator_timer_reset();
             lock_indicator_hide();
+            layer_last_state = 0xFF; // Force trigger update
+            layer_indicator_update(layer_state);
         }
-        layer_last_state = layer_state;
-        layer_indicator_show(layer_last_state);
+    } else {
+        if (usr_via_get_layerkey_show_lockled() && usr_via_lock_system_enabled()) {
+            switch_layerled_to_lockled();
+        } else {
+            switch_lockled_to_layerled();
+        }
     }
 }
+
+// Expose LED timers active state for matrix scan
+bool usr_lockled_timer_active(void) { return lockled_active; }
+bool usr_layerled_timer_active(void) { return layerled_active; }

@@ -22,9 +22,9 @@ enum config_cols {
 void usr_via_config_init(void);
 void usr_via_config_save(void);
 uint8_t usr_via_get_config(uint8_t row, uint8_t col);
-uint8_t usr_via_get_lock_timeout(void);
+uint8_t usr_via_get_led_timeout(void);
 bool usr_via_get_layerkey_show_lockled(void);
 bool usr_via_lock_system_enabled(void);
 void usr_refresh_lockled(void);
-void usr_refresh_layerled(uint8_t new_flag);
+void usr_refresh_layerled(void);
 void via_custom_value_command_kb(uint8_t *data, uint8_t length);
