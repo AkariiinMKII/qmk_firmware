@@ -35,7 +35,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-    if (usr_via_lock_system_enabled()) { lock_indicator_timer(); }
+    if (usr_lockled_timer_active()) { lock_indicator_timer(); }
+    if (usr_layerled_timer_active()) { layer_indicator_timer(); }
     usr_combo_handler();
     led_blink_timer();
 }

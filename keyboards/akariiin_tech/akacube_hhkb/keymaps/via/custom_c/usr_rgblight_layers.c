@@ -11,27 +11,27 @@
 // Background color for layer positions (1,3,5,7), black for others (0,2,4,6)
 static const rgblight_segment_t PROGMEM usr_layer_layerled_bg[] = RGBLIGHT_LAYER_SEGMENTS(
     {0, 1, HSV_BLACK},                // LED 0: Black
-    {1, 1, USR_COLOR_LAYERLED_BG},    // LED 1: Layer 1 area background
+    {1, 1, USR_COLOR_LAYERLED_BG},    // LED 1: Layer 0 area background
     {2, 1, HSV_BLACK},                // LED 2: Black
-    {3, 1, USR_COLOR_LAYERLED_BG},    // LED 3: Layer 2 area background
+    {3, 1, USR_COLOR_LAYERLED_BG},    // LED 3: Layer 1 area background
     {4, 1, HSV_BLACK},                // LED 4: Black
-    {5, 1, USR_COLOR_LAYERLED_BG},    // LED 5: Layer 3 area background
+    {5, 1, USR_COLOR_LAYERLED_BG},    // LED 5: Layer 2 area background
     {6, 1, HSV_BLACK},                // LED 6: Black
-    {7, 1, USR_COLOR_LAYERLED_BG}     // LED 7: Layer 4 area background
+    {7, 1, USR_COLOR_LAYERLED_BG}     // LED 7: Layer 3 area background
 );
 
-// 2-5. Layer indicators (single LEDs): layer 1(LED1), layer 2(LED3), layer 3(LED5), layer 4(LED7)
+// 2-5. Layer indicators (single LEDs): layer 0(LED1), layer 1(LED3), layer 2(LED5), layer 3(LED7)
+static const rgblight_segment_t PROGMEM usr_layer_layerled_mo0[] = RGBLIGHT_LAYER_SEGMENTS(
+    {1, 1, USR_COLOR_LAYERLED_MO0}    // LED 1: Layer 0
+);
 static const rgblight_segment_t PROGMEM usr_layer_layerled_mo1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 1, USR_COLOR_LAYERLED_MO1}    // LED 1: Layer 1
+    {3, 1, USR_COLOR_LAYERLED_MO1}    // LED 3: Layer 1
 );
 static const rgblight_segment_t PROGMEM usr_layer_layerled_mo2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {3, 1, USR_COLOR_LAYERLED_MO2}    // LED 3: Layer 2
+    {5, 1, USR_COLOR_LAYERLED_MO2}    // LED 5: Layer 2
 );
 static const rgblight_segment_t PROGMEM usr_layer_layerled_mo3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {5, 1, USR_COLOR_LAYERLED_MO3}    // LED 5: Layer 3
-);
-static const rgblight_segment_t PROGMEM usr_layer_layerled_mo4[] = RGBLIGHT_LAYER_SEGMENTS(
-    {7, 1, USR_COLOR_LAYERLED_MO4}    // LED 7: Layer 4
+    {7, 1, USR_COLOR_LAYERLED_MO3}    // LED 7: Layer 3
 );
 
 // 6. All-black background layer (base layer for all lock LEDs)
@@ -69,10 +69,10 @@ static const rgblight_segment_t PROGMEM usr_layer_blink[] = RGBLIGHT_LAYER_SEGME
 // Priority order: layer background → layer indicators → lock black bg → lock color bgs → lock indicators → blink layers
 const rgblight_segment_t* const PROGMEM usr_rgblight_layers[] = RGBLIGHT_LAYERS_LIST(
     usr_layer_layerled_bg,            // 0: Layer background
-    usr_layer_layerled_mo1,           // 1: Layer 1
-    usr_layer_layerled_mo2,           // 2: Layer 2
-    usr_layer_layerled_mo3,           // 3: Layer 3
-    usr_layer_layerled_mo4,           // 4: Layer 4
+    usr_layer_layerled_mo0,           // 1: Layer 0
+    usr_layer_layerled_mo1,           // 2: Layer 1
+    usr_layer_layerled_mo2,           // 3: Layer 2
+    usr_layer_layerled_mo3,           // 4: Layer 3
     usr_layer_lockled_bg,             // 5: All-black lock background
     usr_layer_lockled_bg0,            // 6: Lock 0 color background
     usr_layer_lockled_bg1,            // 7: Lock 1 color background

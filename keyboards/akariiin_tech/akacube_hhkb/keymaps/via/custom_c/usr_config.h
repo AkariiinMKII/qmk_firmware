@@ -17,11 +17,11 @@ bool usr_combo_any_active(void);
 // ================== RGB LED COLORS ==================
 
 // Layer indicator colors
-#define USR_COLOR_LAYERLED_BG     HSV_RED_DIM   // Stands for layer off
+#define USR_COLOR_LAYERLED_BG     HSV_RED_DIM
+#define USR_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
 #define USR_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
 #define USR_COLOR_LAYERLED_MO2    HSV_BLUE_DIM
 #define USR_COLOR_LAYERLED_MO3    HSV_BLUE_DIM
-#define USR_COLOR_LAYERLED_MO4    HSV_BLUE_DIM
 
 // Lock indicator colors
 #define USR_COLOR_LOCKLED_BG      HSV_RED_DIM   // Stands for lock off
@@ -44,9 +44,9 @@ bool usr_combo_any_active(void);
 #define USR_LOCKLED_1 2  // capslock
 #define USR_LOCKLED_2 4  // scrolllock
 
-// Lock LED timeout
-// - Time to keep lock indicators on after lock state changes (ms)
-#define USR_LOCKLED_KEEPTIME 1000
+// LED timeout
+// - Time to keep LED indicators on after state changes (ms)
+#define USR_LED_KEEPTIME 1000
 
 
 // ================== LED BLINK SYSTEM ==================
