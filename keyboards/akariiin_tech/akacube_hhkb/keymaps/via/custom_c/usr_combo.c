@@ -75,7 +75,7 @@ static void combo_reset(void) {
     }
 }
 
-static void usr_combo_timer(uint8_t combo_index) {
+static void combo_timer(uint8_t combo_index) {
     if (!combo_satisfied_get(combo_index)) return;
 
     const combo_config_t *config = &combos[combo_index];
@@ -143,14 +143,8 @@ bool usr_combo_check(uint16_t keycode, bool pressed) {
 }
 
 void usr_combo_handler(void) {
-    if (!usr_combo_any_active()) return;
-
-    for (uint8_t i = 0; i < NUM_COMBOS; i++) {
-        usr_combo_timer(i);
-    }
+    for (uint8_t i = 0; i < NUM_COMBOS; i++) { combo_timer(i); }
 }
 
 // Public function to check if any combo is currently satisfied
-bool usr_combo_any_active(void) {
-    return combo_satisfied_state != 0;
-}
+bool usr_combo_any_active(void) { return combo_satisfied_state != 0; }

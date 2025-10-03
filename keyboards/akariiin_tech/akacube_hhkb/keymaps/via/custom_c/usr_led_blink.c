@@ -9,7 +9,7 @@ static bool blink_led_on = false;
 static uint16_t blink_timer = 0;
 
 // Show LED blink effect on LEDs 0-7
-void led_blink_show(void) {
+void usr_led_blink_show(void) {
     if (!blink_active) {
         blink_active = true;
         blink_led_on = true;
@@ -21,7 +21,7 @@ void led_blink_show(void) {
 }
 
 // Hide LED blink effect
-void led_blink_hide(void) {
+void usr_led_blink_hide(void) {
     if (blink_active) {
         blink_active = false;
         blink_led_on = false;
@@ -33,9 +33,7 @@ void led_blink_hide(void) {
 }
 
 // Handle blink timing
-void led_blink_timer(void) {
-    if (!blink_active) return;
-
+void usr_led_blink_timer(void) {
     uint16_t elapsed = timer_elapsed(blink_timer);
     uint16_t target_time = blink_led_on ? USR_BLINK_TIME_ON : USR_BLINK_TIME_IDLE;
 
@@ -46,3 +44,6 @@ void led_blink_timer(void) {
         rgblight_set_layer_state(13, blink_led_on);  // Toggle color layer
     }
 }
+
+// Check if blink timer is active
+bool usr_led_blink_timer_active(void) { return blink_active; }

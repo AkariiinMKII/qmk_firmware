@@ -27,7 +27,7 @@ static void lock_indicator_timer_reset(void) {
     lockled_timer = 0;
 }
 
-void lock_indicator_timer(void) {
+void usr_lock_indicator_timer(void) {
     if (timer_elapsed(lockled_timer) >= (usr_via_get_led_timeout() * 100)) {
         lock_indicator_timer_reset();
         lock_indicator_hide();
@@ -45,7 +45,7 @@ static void layer_indicator_timer_reset(void) {
     layerled_timer = 0;
 }
 
-void layer_indicator_timer(void) {
+void usr_layer_indicator_timer(void) {
     if (timer_elapsed(layerled_timer) >= (usr_via_get_led_timeout() * 100)) {
         layer_indicator_timer_reset();
         layer_indicator_hide();
@@ -53,7 +53,7 @@ void layer_indicator_timer(void) {
 }
 
 // Update lock indicators
-void lock_indicator_update(led_t led_state) {
+void usr_lock_indicator_update(led_t led_state) {
     if (!usr_via_lock_system_enabled()) return;
 
     // Get current lock state for enabled LEDs
@@ -76,7 +76,7 @@ void lock_indicator_update(led_t led_state) {
 }
 
 // Update layer indicators
-void layer_indicator_update(layer_state_t state) {
+void usr_layer_indicator_update(layer_state_t state) {
     if (state != layer_last_state) {
         layer_last_state = state;  // Keep layer state cache up to date
 
@@ -128,7 +128,7 @@ void usr_refresh_lockled(void) {
 
     if (usr_via_lock_system_enabled()) {
         lock_last_state = 0xFF; // Force trigger update
-        lock_indicator_update(host_keyboard_led_state());
+        usr_lock_indicator_update(host_keyboard_led_state());
     } else {
         lock_last_state = 0;
         lock_indicator_hide();
@@ -143,7 +143,7 @@ void usr_refresh_layerled(void) {
             lock_indicator_timer_reset();
             lock_indicator_hide();
             layer_last_state = 0xFF; // Force trigger update
-            layer_indicator_update(layer_state);
+            usr_layer_indicator_update(layer_state);
         }
     } else {
         if (usr_via_get_layerkey_show_lockled() && usr_via_lock_system_enabled()) {

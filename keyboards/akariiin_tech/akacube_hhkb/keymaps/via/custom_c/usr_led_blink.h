@@ -13,6 +13,7 @@
 #    define USR_BLINK_TIME_IDLE 200
 #endif
 
-void led_blink_show(void);
-void led_blink_hide(void);
-void led_blink_timer(void);
+void usr_led_blink_show(void);
+void usr_led_blink_hide(void);
+void usr_led_blink_timer(void);
+bool usr_led_blink_timer_active(void);
