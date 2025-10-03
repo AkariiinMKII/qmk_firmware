@@ -18,13 +18,13 @@ void keyboard_post_init_user(void) {
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {
-    lock_indicator_update(led_state);
+    usr_lock_indicator_update(led_state);
     return true;
 }
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
-    layer_indicator_update(state);
+    usr_layer_indicator_update(state);
     return state;
 }
 
@@ -35,10 +35,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-    if (usr_lockled_timer_active()) { lock_indicator_timer(); }
-    if (usr_layerled_timer_active()) { layer_indicator_timer(); }
-    usr_combo_handler();
-    led_blink_timer();
+    if (usr_lockled_timer_active()) { usr_lock_indicator_timer(); }
+    if (usr_layerled_timer_active()) { usr_layer_indicator_timer(); }
+    if (usr_combo_any_active()) { usr_combo_handler(); }
+    if (usr_led_blink_timer_active()) { usr_led_blink_timer(); }
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
