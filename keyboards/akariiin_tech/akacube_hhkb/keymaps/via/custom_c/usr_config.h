@@ -9,8 +9,8 @@
 #include "usr_rgb_colors.h"
 #include "usr_via_config.h"
 
-void led_blink_show(void);
-void led_blink_hide(void);
+void usr_led_blink_show(void);
+void usr_led_blink_hide(void);
 bool usr_combo_any_active(void);
 
 
@@ -77,17 +77,17 @@ bool usr_combo_any_active(void);
 #define USR_RESET_COMBO_TIME 5000         // Change reset timing
 static inline void usr_reset_combo_on_complete(void) {
     if (!usr_combo_any_active()) {
-        led_blink_hide();
+        usr_led_blink_hide();
     }
     wait_ms(100);
     reset_keyboard();
 }
 static inline void usr_reset_combo_on_satisfied(void) {
-    led_blink_show();
+    usr_led_blink_show();
 }
 static inline void usr_reset_combo_on_reset(void) {
     if (!usr_combo_any_active()) {
-        led_blink_hide();
+        usr_led_blink_hide();
     }
 }
 
@@ -96,16 +96,16 @@ static inline void usr_reset_combo_on_reset(void) {
 #define USR_CIALLO_COMBO_TIME 3000        // Change ciallo timing
 static inline void usr_ciallo_combo_on_complete(void) {
     if (!usr_combo_any_active()) {
-        led_blink_hide();
+        usr_led_blink_hide();
     }
     SEND_STRING("ciallo");
 }
 static inline void usr_ciallo_combo_on_satisfied(void) {
-    led_blink_show();
+    usr_led_blink_show();
 }
 static inline void usr_ciallo_combo_on_reset(void) {
     if (!usr_combo_any_active()) {
-        led_blink_hide();
+        usr_led_blink_hide();
     }
 }
 
