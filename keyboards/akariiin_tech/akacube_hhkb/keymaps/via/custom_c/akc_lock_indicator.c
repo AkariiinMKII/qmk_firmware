@@ -1,15 +1,15 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "usr_lock_indicator.h"
-#include "usr_led_control.h"
-#include "usr_via_config.h"
+#include "akc_lock_indicator.h"
+#include "akc_led_control.h"
+#include "akc_via_config.h"
 
 // Show lock indicators - black background if any enabled, color backgrounds if enabled, indicators if active
-void lock_indicator_show(uint8_t lock_state) {
-    uint8_t led0 = usr_via_get_config(LOCK_LED_0, BITMASK);
-    uint8_t led1 = usr_via_get_config(LOCK_LED_1, BITMASK);
-    uint8_t led2 = usr_via_get_config(LOCK_LED_2, BITMASK);
+void akc_lock_indicator_show(uint8_t lock_state) {
+    uint8_t led0 = akc_via_get_config(LOCK_LED_0, BITMASK);
+    uint8_t led1 = akc_via_get_config(LOCK_LED_1, BITMASK);
+    uint8_t led2 = akc_via_get_config(LOCK_LED_2, BITMASK);
 
     // All-black background (if any lock LED is enabled)
     rgblight_set_layer_state(5, (led0 | led1 | led2) > 0);
@@ -26,7 +26,7 @@ void lock_indicator_show(uint8_t lock_state) {
 }
 
 // Hide all lock indicators
-void lock_indicator_hide(void) {
+void akc_lock_indicator_hide(void) {
     rgblight_set_layer_state(5, false);   // All-black background
     rgblight_set_layer_state(6, false);   // Lock 0 color background
     rgblight_set_layer_state(7, false);   // Lock 1 color background

@@ -94,4 +94,4 @@
 #define HSV_BLACK        0, 0, 0
 
 // Function declarations
-HSV usr_pick_dim_color(uint8_t color_index);
+HSV akc_pick_dim_color(uint8_t color_index);

@@ -1,10 +1,10 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "usr_led_control.h"
-#include "usr_layer_indicator.h"
-#include "usr_lock_indicator.h"
-#include "usr_via_config.h"
+#include "akc_led_control.h"
+#include "akc_layer_indicator.h"
+#include "akc_lock_indicator.h"
+#include "akc_via_config.h"
 
 // Lock LED state variables
 static uint8_t lock_last_state = 0;
@@ -27,10 +27,10 @@ static void lock_indicator_timer_reset(void) {
     lockled_timer = 0;
 }
 
-void usr_lock_indicator_timer(void) {
-    if (timer_elapsed(lockled_timer) >= (usr_via_get_led_timeout() * 100)) {
+void akc_lock_indicator_timer(void) {
+    if (timer_elapsed(lockled_timer) >= (akc_via_get_led_timeout() * 100)) {
         lock_indicator_timer_reset();
-        lock_indicator_hide();
+        akc_lock_indicator_hide();
     }
 }
 
@@ -45,43 +45,43 @@ static void layer_indicator_timer_reset(void) {
     layerled_timer = 0;
 }
 
-void usr_layer_indicator_timer(void) {
-    if (timer_elapsed(layerled_timer) >= (usr_via_get_led_timeout() * 100)) {
+void akc_layer_indicator_timer(void) {
+    if (timer_elapsed(layerled_timer) >= (akc_via_get_led_timeout() * 100)) {
         layer_indicator_timer_reset();
-        layer_indicator_hide();
+        akc_layer_indicator_hide();
     }
 }
 
 // Update lock indicators
-void usr_lock_indicator_update(led_t led_state) {
-    if (!usr_via_lock_system_enabled()) return;
+void akc_lock_indicator_update(led_t led_state) {
+    if (!akc_via_lock_system_enabled()) return;
 
     // Get current lock state for enabled LEDs
-    uint8_t lock_current_mask = usr_via_get_config(LOCK_LED_0, BITMASK) |
-                               usr_via_get_config(LOCK_LED_1, BITMASK) |
-                               usr_via_get_config(LOCK_LED_2, BITMASK);
+    uint8_t lock_current_mask = akc_via_get_config(LOCK_LED_0, BITMASK) |
+                               akc_via_get_config(LOCK_LED_1, BITMASK) |
+                               akc_via_get_config(LOCK_LED_2, BITMASK);
     uint8_t lock_current_state = led_state.raw & lock_current_mask;
 
     // Only update if state changed
     if (lock_current_state != lock_last_state) {
         lock_last_state = lock_current_state;
         // Handle lock indicators override
-        if (layer_state != default_layer_state && usr_via_get_layerkey_show_lockled()) {
+        if (layer_state != default_layer_state && akc_via_get_layerkey_show_lockled()) {
             lock_indicator_timer_reset();  // Disable timer on upper layer for indicator override
         } else {
             lock_indicator_timer_start();  // Otherwise start timer
         }
-        lock_indicator_show(lock_last_state);
+        akc_lock_indicator_show(lock_last_state);
     }
 }
 
 // Update layer indicators
-void usr_layer_indicator_update(layer_state_t state) {
+void akc_layer_indicator_update(layer_state_t state) {
     if (state != layer_last_state) {
         layer_last_state = state;  // Keep layer state cache up to date
 
         // Handle lock indicators override
-        if (usr_via_lock_system_enabled() && usr_via_get_layerkey_show_lockled()) {
+        if (akc_via_lock_system_enabled() && akc_via_get_layerkey_show_lockled()) {
             if (state != default_layer_state) {
                 // Layer key down: show lock indicators without timeout
                 lock_indicator_timer_reset();
@@ -89,7 +89,7 @@ void usr_layer_indicator_update(layer_state_t state) {
                 // Layer key up: continue lock indicators for period of timeout
                 lock_indicator_timer_start();
             }
-            lock_indicator_show(lock_last_state);
+            akc_lock_indicator_show(lock_last_state);
         }
         // Update layer indicators even if in background
         if (state != default_layer_state) {
@@ -97,7 +97,7 @@ void usr_layer_indicator_update(layer_state_t state) {
         } else {
             layer_indicator_timer_start();
         }
-        layer_indicator_show(layer_last_state);
+        akc_layer_indicator_show(layer_last_state);
     }
 }
 
@@ -107,8 +107,8 @@ static void switch_layerled_to_lockled(void) {
         lockled_active = true;
         lockled_timer = layerled_timer; // Transfer remaining time
         layer_indicator_timer_reset();
-        layer_indicator_hide();
-        lock_indicator_show(lock_last_state);
+        akc_layer_indicator_hide();
+        akc_lock_indicator_show(lock_last_state);
     }
 }
 
@@ -117,36 +117,36 @@ static void switch_lockled_to_layerled(void) {
         layerled_active = true;
         layerled_timer = lockled_timer; // Transfer remaining time
         lock_indicator_timer_reset();
-        lock_indicator_hide();
-        layer_indicator_show(layer_last_state);
+        akc_lock_indicator_hide();
+        akc_layer_indicator_show(layer_last_state);
     }
 }
 
 // Refresh indicators on config change
-void usr_refresh_lockled(void) {
+void akc_refresh_lockled(void) {
     lock_indicator_timer_reset();
 
-    if (usr_via_lock_system_enabled()) {
+    if (akc_via_lock_system_enabled()) {
         lock_last_state = 0xFF; // Force trigger update
-        usr_lock_indicator_update(host_keyboard_led_state());
+        akc_lock_indicator_update(host_keyboard_led_state());
     } else {
         lock_last_state = 0;
-        lock_indicator_hide();
+        akc_lock_indicator_hide();
     }
 }
 
-void usr_refresh_layerled(void) {
+void akc_refresh_layerled(void) {
     if (layer_state != default_layer_state) {
-        if (usr_via_get_layerkey_show_lockled() && usr_via_lock_system_enabled()) {
-            usr_refresh_lockled();
+        if (akc_via_get_layerkey_show_lockled() && akc_via_lock_system_enabled()) {
+            akc_refresh_lockled();
         } else {
             lock_indicator_timer_reset();
-            lock_indicator_hide();
+            akc_lock_indicator_hide();
             layer_last_state = 0xFF; // Force trigger update
-            usr_layer_indicator_update(layer_state);
+            akc_layer_indicator_update(layer_state);
         }
     } else {
-        if (usr_via_get_layerkey_show_lockled() && usr_via_lock_system_enabled()) {
+        if (akc_via_get_layerkey_show_lockled() && akc_via_lock_system_enabled()) {
             switch_layerled_to_lockled();
         } else {
             switch_lockled_to_layerled();
@@ -155,5 +155,5 @@ void usr_refresh_layerled(void) {
 }
 
 // Expose LED timers active state for matrix scan
-bool usr_lockled_timer_active(void) { return lockled_active; }
-bool usr_layerled_timer_active(void) { return layerled_active; }
+bool akc_lockled_timer_active(void) { return lockled_active; }
+bool akc_layerled_timer_active(void) { return layerled_active; }

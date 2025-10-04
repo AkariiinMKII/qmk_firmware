@@ -4,7 +4,6 @@
 #pragma once
 
 #include "quantum.h"
-#include "usr_config.h"
 
-void layer_indicator_show(layer_state_t state);
-void layer_indicator_hide(void);
+void akc_lock_indicator_show(uint8_t lock_state);
+void akc_lock_indicator_hide(void);

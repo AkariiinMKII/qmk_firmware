@@ -1,10 +1,10 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "usr_rgb_colors.h"
+#include "akc_rgb_colors.h"
 
 // Convert color index to HSV value
-HSV usr_pick_dim_color(uint8_t color_index) {
+HSV akc_pick_dim_color(uint8_t color_index) {
     switch (color_index) {
         // Index 0 reserved for EEPROM reset detection
         case 1:  return (HSV){0,   255, HSV_VAL_DIM};  // Red
