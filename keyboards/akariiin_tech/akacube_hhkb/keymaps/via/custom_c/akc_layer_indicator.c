@@ -1,10 +1,10 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "usr_layer_indicator.h"
+#include "akc_layer_indicator.h"
 
 // Show layer indicators with bit checks
-void layer_indicator_show(layer_state_t state) {
+void akc_layer_indicator_show(layer_state_t state) {
     rgblight_set_layer_state(0, true);              // Layer background
     rgblight_set_layer_state(1, (state & 1) > 0);   // Layer 0 indicator
     rgblight_set_layer_state(2, (state & 2) > 0);   // Layer 1 indicator
@@ -13,7 +13,7 @@ void layer_indicator_show(layer_state_t state) {
 }
 
 // Hide all layer indicators
-void layer_indicator_hide(void) {
+void akc_layer_indicator_hide(void) {
     rgblight_set_layer_state(0, false);
     rgblight_set_layer_state(1, false);
     rgblight_set_layer_state(2, false);

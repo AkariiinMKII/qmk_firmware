@@ -1,8 +1,8 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "usr_via_config.h"
-#include "usr_config.h"
+#include "akc_via_config.h"
+#include "akc_config.h"
 #include "eeconfig.h"
 
 // Compile-time check to ensure EEPROM user data space is sufficient
@@ -189,14 +189,14 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 }
 
 // Initialize VIA configuration from EEPROM using user datablock
-void usr_via_config_init(void) {
+void akc_via_config_init(void) {
     if (config_loaded) return;
 
     static const uint8_t default_config[4][3] = {
-        {USR_LOCKLED_0, 1, 5},  // 1: Red, 5: Green
-        {USR_LOCKLED_1, 1, 5},  // 1: Red, 5: Green
-        {USR_LOCKLED_2, 1, 5},  // 1: Red, 5: Green
-        {(USR_LED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
+        {AKC_LOCKLED_0, 1, 5},  // 1: Red, 5: Green
+        {AKC_LOCKLED_1, 1, 5},  // 1: Red, 5: Green
+        {AKC_LOCKLED_2, 1, 5},  // 1: Red, 5: Green
+        {(AKC_LED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
     };
 
     eeload_all_config();
@@ -232,29 +232,29 @@ void usr_via_config_init(void) {
 
     eerestore_default_layer();
 
-    usr_refresh_lockled();
-    usr_refresh_layerled();
+    akc_refresh_lockled();
+    akc_refresh_layerled();
 }
 
-void usr_via_config_save(void) {
+void akc_via_config_save(void) {
     eesave_all_config();
 }
 
 // Public API functions
-uint8_t usr_via_get_config(uint8_t row, uint8_t col) {
+uint8_t akc_via_get_config(uint8_t row, uint8_t col) {
     if (!is_valid_config_matrix(row, col) || (row == 3 && col == 0)) return 0;
     return via_config[row][col];
 }
 
-uint8_t usr_via_get_led_timeout(void) {
+uint8_t akc_via_get_led_timeout(void) {
     return pick_mixed_time();
 }
 
-bool usr_via_get_layerkey_show_lockled(void) {
+bool akc_via_get_layerkey_show_lockled(void) {
     return pick_mixed_flag() != 0;
 }
 
-bool usr_via_lock_system_enabled(void) {
+bool akc_via_lock_system_enabled(void) {
     return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
 }
 
@@ -363,12 +363,12 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         return;
                 }
 
-                if (should_update_lockled) { usr_refresh_lockled(); }
-                if (should_update_layerled) { usr_refresh_layerled(); }
+                if (should_update_lockled) { akc_refresh_lockled(); }
+                if (should_update_layerled) { akc_refresh_layerled(); }
                 break;
             }
             case id_custom_save: {
-                usr_via_config_save();
+                akc_via_config_save();
                 break;
             }
             default:

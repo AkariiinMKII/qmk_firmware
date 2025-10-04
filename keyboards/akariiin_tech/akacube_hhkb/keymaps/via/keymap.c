@@ -3,42 +3,42 @@
 
 #include QMK_KEYBOARD_H
 
-#include "custom_c/usr_config.h"
-#include "custom_c/usr_rgblight_layers.h"
-#include "custom_c/usr_led_control.h"
-#include "custom_c/usr_led_blink.h"
-#include "custom_c/usr_combo.h"
-#include "custom_c/usr_via_config.h"
+#include "custom_c/akc_config.h"
+#include "custom_c/akc_rgblight_layers.h"
+#include "custom_c/akc_led_control.h"
+#include "custom_c/akc_led_blink.h"
+#include "custom_c/akc_combo.h"
+#include "custom_c/akc_via_config.h"
 
 // Initialize RGB layers and VIA configuration on startup
 void keyboard_post_init_user(void) {
-    usr_rgblight_layers_init();     // Initialize RGB layers first with default colors
-    usr_via_config_init();          // Then load VIA config and update colors
+    akc_rgblight_layers_init();     // Initialize RGB layers first with default colors
+    akc_via_config_init();          // Then load VIA config and update colors
 }
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {
-    usr_lock_indicator_update(led_state);
+    akc_lock_indicator_update(led_state);
     return true;
 }
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
-    usr_layer_indicator_update(state);
+    akc_layer_indicator_update(state);
     return state;
 }
 
 // Process key presses for combo detection
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    return usr_combo_check(keycode, record->event.pressed);
+    return akc_combo_check(keycode, record->event.pressed);
 }
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-    if (usr_lockled_timer_active()) { usr_lock_indicator_timer(); }
-    if (usr_layerled_timer_active()) { usr_layer_indicator_timer(); }
-    if (usr_combo_any_active()) { usr_combo_handler(); }
-    if (usr_led_blink_timer_active()) { usr_led_blink_timer(); }
+    if (akc_lockled_timer_active()) { akc_lock_indicator_timer(); }
+    if (akc_layerled_timer_active()) { akc_layer_indicator_timer(); }
+    if (akc_combo_any_active()) { akc_combo_handler(); }
+    if (akc_led_blink_timer_active()) { akc_led_blink_timer(); }
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
