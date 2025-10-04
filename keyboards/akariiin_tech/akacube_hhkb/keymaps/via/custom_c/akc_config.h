@@ -46,7 +46,7 @@ bool akc_combo_any_active(void);
 
 // LED timeout
 // - Time to keep LED indicators on after state changes (ms)
-#define AKC_LED_KEEPTIME 1000
+#define AKC_LED_KEEPTIME 1500
 
 
 // ================== LED BLINK SYSTEM ==================

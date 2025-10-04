@@ -8,7 +8,7 @@
 #include "akc_via_config.h"
 
 #ifndef AKC_LED_KEEPTIME
-#    define AKC_LED_KEEPTIME 1000
+#    define AKC_LED_KEEPTIME 1500
 #endif
 #ifndef AKC_LOCKLED_1
 #    define AKC_LOCKLED_1 1
