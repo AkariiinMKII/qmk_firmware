@@ -7,11 +7,10 @@
 
 #include "quantum.h"
 #include "akc_rgb_colors.h"
-#include "akc_via_config.h"
 
+bool akc_combo_any_active(void);
 void akc_led_blink_show(void);
 void akc_led_blink_hide(void);
-bool akc_combo_any_active(void);
 
 
 // ================== RGB LED COLORS ==================

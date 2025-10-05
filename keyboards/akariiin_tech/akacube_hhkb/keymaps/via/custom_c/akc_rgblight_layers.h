@@ -5,7 +5,6 @@
 
 #include "quantum.h"
 #include "akc_config.h"
-#include "akc_led_control.h"
 
 #ifndef AKC_COLOR_LAYERLED_BG
 #    define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM

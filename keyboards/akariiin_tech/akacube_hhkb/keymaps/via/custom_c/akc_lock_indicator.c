@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_lock_indicator.h"
-#include "akc_led_control.h"
 #include "akc_via_config.h"
 
 // Show lock indicators - black background if any enabled, color backgrounds if enabled, indicators if active

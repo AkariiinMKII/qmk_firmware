@@ -3,17 +3,16 @@
 
 #include QMK_KEYBOARD_H
 
-#include "custom_c/akc_config.h"
+#include "custom_c/akc_via_config.h"
 #include "custom_c/akc_rgblight_layers.h"
 #include "custom_c/akc_led_control.h"
-#include "custom_c/akc_led_blink.h"
 #include "custom_c/akc_combo.h"
-#include "custom_c/akc_via_config.h"
+#include "custom_c/akc_led_blink.h"
 
-// Initialize RGB layers and VIA configuration on startup
+// Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
-    akc_rgblight_layers_init();     // Initialize RGB layers first with default colors
-    akc_via_config_init();          // Then load VIA config and update colors
+    akc_via_config_init();  // Load VIA configuration
+    akc_init_lockled();  // Initialize RGB layers with VIA colors
 }
 
 // Update RGB indicators when lock states change

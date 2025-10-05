@@ -20,6 +20,7 @@ HSV akc_pick_dim_color(uint8_t color_index) {
         case 11: return (HSV){213, 255, HSV_VAL_DIM};  // Magenta
         case 12: return (HSV){234, 255, HSV_VAL_DIM};  // Rose
         case 13: return (HSV){0,   0,   HSV_VAL_DIM};  // White
+        case 14: return (HSV){0,   0,   0};            // Black
         default: return (HSV){0,   0,   0};            // Black (invalid)
     }
 }

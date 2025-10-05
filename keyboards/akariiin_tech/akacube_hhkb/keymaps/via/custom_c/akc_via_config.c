@@ -2,8 +2,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_via_config.h"
-#include "akc_config.h"
 #include "eeconfig.h"
+#include "akc_config.h"
+
+// Forward declarations from akc_led_control
+void akc_refresh_lockled(void);
+void akc_refresh_layerled(void);
+void akc_init_lockled(void);
+void akc_init_layerled(void);
 
 // Compile-time check to ensure EEPROM user data space is sufficient
 _Static_assert(8 <= EECONFIG_USER_DATA_SIZE, "EEPROM user data size too small for configuration");
@@ -55,7 +61,7 @@ static bool is_valid_timeout_value(uint8_t value) {
 }
 
 static bool is_valid_color_index(uint8_t value) {
-    return (value >= 1 && value <= 13);
+    return (value >= 1 && value <= 14);
 }
 
 static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
@@ -228,12 +234,9 @@ void akc_via_config_init(void) {
         }
     }
 
-    config_loaded = true;
-
     eerestore_default_layer();
 
-    akc_refresh_lockled();
-    akc_refresh_layerled();
+    config_loaded = true;
 }
 
 void akc_via_config_save(void) {
@@ -316,55 +319,59 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                 break;
             }
             case id_custom_set_value: {
-                bool should_update_lockled = false;
-                bool should_update_layerled = false;
+                bool should_refresh_lockled = false;
+                bool should_refresh_layerled = false;
+                bool should_init_lockled = false;
+                bool should_init_layerled = false;
                 switch (*value_id) {
                     case LOCK_LED_0_CONFIG:
-                        should_update_lockled = via_update_config(0, 0, value_data[0]);
+                        should_refresh_lockled = via_update_config(0, 0, value_data[0]);
                         break;
                     case LOCK_LED_0_COLOR_OFF:
-                        should_update_lockled = via_update_config(0, 1, value_data[0]);
+                        should_init_lockled = via_update_config(0, 1, value_data[0]);
                         break;
                     case LOCK_LED_0_COLOR_ON:
-                        should_update_lockled = via_update_config(0, 2, value_data[0]);
+                        should_init_lockled = via_update_config(0, 2, value_data[0]);
                         break;
                     case LOCK_LED_1_CONFIG:
-                        should_update_lockled = via_update_config(1, 0, value_data[0]);
+                        should_refresh_lockled = via_update_config(1, 0, value_data[0]);
                         break;
                     case LOCK_LED_1_COLOR_OFF:
-                        should_update_lockled = via_update_config(1, 1, value_data[0]);
+                        should_init_lockled = via_update_config(1, 1, value_data[0]);
                         break;
                     case LOCK_LED_1_COLOR_ON:
-                        should_update_lockled = via_update_config(1, 2, value_data[0]);
+                        should_init_lockled = via_update_config(1, 2, value_data[0]);
                         break;
                     case LOCK_LED_2_CONFIG:
-                        should_update_lockled = via_update_config(2, 0, value_data[0]);
+                        should_refresh_lockled = via_update_config(2, 0, value_data[0]);
                         break;
                     case LOCK_LED_2_COLOR_OFF:
-                        should_update_lockled = via_update_config(2, 1, value_data[0]);
+                        should_init_lockled = via_update_config(2, 1, value_data[0]);
                         break;
                     case LOCK_LED_2_COLOR_ON:
-                        should_update_lockled = via_update_config(2, 2, value_data[0]);
+                        should_init_lockled = via_update_config(2, 2, value_data[0]);
                         break;
                     case LAYER_LED_COLOR_OFF:
-                        should_update_layerled = via_update_config(3, 1, value_data[0]);
+                        should_init_layerled = via_update_config(3, 1, value_data[0]);
                         break;
                     case LAYER_LED_COLOR_ON:
-                        should_update_layerled = via_update_config(3, 2, value_data[0]);
+                        should_init_layerled = via_update_config(3, 2, value_data[0]);
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
                         via_update_config(3, 0, merge_mixed_time(value_data[0]));
                         break;
                     case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        should_update_layerled = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
+                        should_refresh_layerled = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
                         break;
                     default:
                         *command_id = id_unhandled;
                         return;
                 }
 
-                if (should_update_lockled) { akc_refresh_lockled(); }
-                if (should_update_layerled) { akc_refresh_layerled(); }
+                if (should_refresh_lockled) { akc_refresh_lockled(); }
+                if (should_refresh_layerled) { akc_refresh_layerled(); }
+                if (should_init_lockled) { akc_init_lockled(); }
+                if (should_init_layerled) { akc_init_layerled(); }
                 break;
             }
             case id_custom_save: {
