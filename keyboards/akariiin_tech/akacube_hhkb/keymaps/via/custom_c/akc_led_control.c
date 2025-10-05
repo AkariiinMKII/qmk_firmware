@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_led_control.h"
-#include "akc_layer_indicator.h"
-#include "akc_lock_indicator.h"
 #include "akc_via_config.h"
+#include "akc_rgblight_layers.h"
+#include "akc_lock_indicator.h"
+#include "akc_layer_indicator.h"
 
 // Lock LED state variables
 static uint8_t lock_last_state = 0;
@@ -151,6 +152,38 @@ void akc_refresh_layerled(void) {
         } else {
             switch_lockled_to_layerled();
         }
+    }
+}
+
+// Initialize RGB layers and refresh lock LEDs
+void akc_init_lockled(void) {
+    lock_indicator_timer_reset();
+    layer_indicator_timer_reset();
+    akc_rgblight_layers_init();
+    if (layer_state != default_layer_state) {
+        akc_layer_indicator_show(layer_state);
+    }
+    if (!akc_via_lock_system_enabled()) return;
+    if (layer_state == default_layer_state || !akc_via_get_layerkey_show_lockled()) {
+        lock_indicator_timer_start();
+    }
+    akc_lock_indicator_show(host_keyboard_led_state().raw);
+}
+
+// Initialize RGB layers and refresh layer LEDs
+void akc_init_layerled(void) {
+    lock_indicator_timer_reset();
+    layer_indicator_timer_reset();
+    akc_rgblight_layers_init();
+    if (akc_via_lock_system_enabled() && akc_via_get_layerkey_show_lockled()) {
+        if (layer_state != default_layer_state) {
+            akc_lock_indicator_show(host_keyboard_led_state().raw);
+        }
+    } else {
+        if (layer_state == default_layer_state) {
+            layer_indicator_timer_start();
+        }
+        akc_layer_indicator_show(layer_state);
     }
 }
 

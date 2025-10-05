@@ -7,7 +7,7 @@
 #include "akc_config.h"
 
 #ifndef AKC_BLINK_TIME_ON
-#    define AKC_BLINK_TIME_ON 300
+#    define AKC_BLINK_TIME_ON 200
 #endif
 #ifndef AKC_BLINK_TIME_IDLE
 #    define AKC_BLINK_TIME_IDLE 200

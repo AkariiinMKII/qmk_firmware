@@ -5,7 +5,6 @@
 
 #include "quantum.h"
 #include "akc_config.h"
-#include "akc_led_blink.h"
 
 #ifndef AKC_COMBO_MOD1
 #    define AKC_COMBO_MOD1 KC_LSFT
