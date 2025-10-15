@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_via_config.h"
-#include "eeconfig.h"
 #include "akc_config.h"
 
 // Forward declarations from akc_led_control
@@ -11,8 +10,8 @@ void akc_refresh_layerled(void);
 void akc_init_lockled(void);
 void akc_init_layerled(void);
 
-// Compile-time check to ensure EEPROM user data space is sufficient
-_Static_assert(8 <= EECONFIG_USER_DATA_SIZE, "EEPROM user data size too small for configuration");
+// Compile-time check to ensure VIA custom config space is sufficient
+_Static_assert(8 <= VIA_EEPROM_CUSTOM_CONFIG_SIZE, "VIA custom config size too small for configuration");
 
 // VIA Configuration Channel IDs
 enum via_config_channels {
@@ -40,15 +39,15 @@ enum lock_led_config_ids {
 static bool config_loaded = false;
 
 // Configuration matrix [4x3]:
-//      | col 0       | col 1      | col 2
-// -----+-------------+------------+----------
-// row 0| lock0_mask  | color_off  | color_on
-// row 1| lock1_mask  | color_off  | color_on
-// row 2| lock2_mask  | color_off  | color_on
-// row 3| timeout|flag| layer_off  | layer_on
+//      | col 0        | col 1           | col 2
+// -----+--------------+-----------------+----------------
+// row 0| lock0_mask   | lock0_off_color | lock0_on_color
+// row 1| lock1_mask   | lock1_off_color | lock1_on_color
+// row 2| lock2_mask   | lock2_off_color | lock2_on_color
+// row 3| flag|timeout | layer_off_color | layer_on_color
 //
 // Lock mask: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
-// Colors: 1-13 (0=EEPROM reset), EEPROM: 8 bytes packed
+// Colors: 1-13 (0=EEPROM reset), EEPROM VIA custom config area: 8 bytes packed
 static uint8_t via_config[4][3];
 
 // Validation functions
@@ -72,26 +71,18 @@ static bool is_valid_default_layer(uint32_t mask) {
     return (mask == 1 || mask == 2 || mask == 4 || mask == 8);
 }
 
-// Get default layer from EEPROM or keymap
-static void eerestore_default_layer(void) {
-    uint32_t load_default_layer = 1;  // Initialize with fallback layer 0
-
-    uint8_t eeload_default_layer_shift = get_highest_layer(eeconfig_read_default_layer());
-    uint32_t eeload_default_layer = (1UL << eeload_default_layer_shift);
-
-    if (is_valid_default_layer(eeload_default_layer)) {
-        load_default_layer = eeload_default_layer;  // Valid default layer from EEPROM
-    } else if (is_valid_default_layer(default_layer_state)) {
-        load_default_layer = default_layer_state;  // Valid default layer from keymap
+// Workaround for layer_state initialization issue
+static void init_layer_state(void) {
+    if (!is_valid_default_layer(default_layer_state)) {
+        default_layer_set(1);  // Reset to layer 0 if invalid
     }
 
-    default_layer_set(load_default_layer);
-    layer_state_set(default_layer_state); // Workaround to ensure layer state is set
+    layer_state |= default_layer_state;
 }
 
 // Data packing/unpacking functions
 // 64-bit EEPROM: [63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
-// 16-bit pack: [15:12 color_on][11:8 color_off][7:0 config/timeout]
+// 16-bit pack: [15:12 color_on][11:8 color_off][7:0 flag/timeout]
 static uint16_t pack_matrix_row(uint8_t row_index) {
     return (uint16_t)via_config[row_index][0] |
            ((uint16_t)(via_config[row_index][1] & 0xF) << 8) |
@@ -123,10 +114,10 @@ static uint8_t merge_mixed_flag(uint8_t new_flag) {
     return (timeout & 0x7F) | ((new_flag & 0x1) << 7);
 }
 
-// EEPROM I/O functions
+// VIA custom config I/O functions
 static void eeload_all_config(void) {
     uint8_t config[8];
-    eeconfig_read_user_datablock(config, 0, 8);
+    via_read_custom_config(config, 0, 8);
     for (uint8_t row = 0; row < 4; row++) {
         uint8_t offset = row * 2;
         uint16_t packed = (uint16_t)config[offset] | ((uint16_t)config[offset + 1] << 8);
@@ -142,7 +133,7 @@ static void eesave_all_config(void) {
         config[offset] = (uint8_t)(packed & 0xFF);
         config[offset + 1] = (uint8_t)((packed >> 8) & 0xFF);
     }
-    eeconfig_update_user_datablock(config, 0, 8);
+    via_update_custom_config(config, 0, 8);
 }
 
 static void eesave_config_matrix_row(uint8_t row_index) {
@@ -154,7 +145,7 @@ static void eesave_config_matrix_row(uint8_t row_index) {
         (uint8_t)(packed & 0xFF),
         (uint8_t)((packed >> 8) & 0xFF)
     };
-    eeconfig_update_user_datablock(data, offset, 2);
+    via_update_custom_config(data, offset, 2);
 }
 
 // Core configuration functions
@@ -176,7 +167,7 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
             if (row_index < 3) {
                 is_valid = is_valid_lock_led_value(new_value);
             } else {
-                // For packed timeout/flag, validate the entire byte
+                // For packed flag/timeout, validate the entire byte
                 uint8_t timeout = new_value & 0x7F;
                 is_valid = is_valid_timeout_value(timeout);
             }
@@ -188,13 +179,13 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 
     if (!is_valid) return false;
 
-    // Update the value and save to EEPROM
+    // Update the value and save to EEPROM VIA custom config area
     via_config[row_index][col_index] = new_value;
     eesave_config_matrix_row(row_index);
     return true;
 }
 
-// Initialize VIA configuration from EEPROM using user datablock
+// Initialize VIA configuration from EEPROM VIA custom config area
 void akc_via_config_init(void) {
     if (config_loaded) return;
 
@@ -234,7 +225,7 @@ void akc_via_config_init(void) {
         }
     }
 
-    eerestore_default_layer();
+    init_layer_state();
 
     config_loaded = true;
 }
