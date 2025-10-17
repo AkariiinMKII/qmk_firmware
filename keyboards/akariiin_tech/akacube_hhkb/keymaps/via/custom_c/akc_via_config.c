@@ -3,12 +3,6 @@
 
 #include "akc_custom.h"
 
-// Forward declarations from akc_led_control
-void akc_refresh_lockled(void);
-void akc_refresh_layerled(void);
-void akc_init_lockled(void);
-void akc_init_layerled(void);
-
 // Compile-time check to ensure VIA custom config space is sufficient
 _Static_assert(8 <= VIA_EEPROM_CUSTOM_CONFIG_SIZE, "VIA custom config size too small for configuration");
 
@@ -172,7 +166,7 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 }
 
 // Initialize VIA configuration from EEPROM VIA custom config area
-void akc_via_config_init(void) {
+void akc_via_init_config(void) {
     if (config_loaded) return;
 
     static const uint8_t default_config[4][3] = {
@@ -214,7 +208,7 @@ void akc_via_config_init(void) {
     config_loaded = true;
 }
 
-void akc_via_config_save(void) {
+void akc_via_save_config(void) {
     eesave_all_config();
 }
 
@@ -228,7 +222,7 @@ uint8_t akc_via_get_led_timeout(void) {
     return pick_mixed_time();
 }
 
-bool akc_via_get_layerkey_show_lockled(void) {
+bool akc_via_layerkey_show_lockled_enabled(void) {
     return pick_mixed_flag() != 0;
 }
 
@@ -343,14 +337,14 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         return;
                 }
 
-                if (should_refresh_lockled) { akc_refresh_lockled(); }
-                if (should_refresh_layerled) { akc_refresh_layerled(); }
-                if (should_init_lockled) { akc_init_lockled(); }
-                if (should_init_layerled) { akc_init_layerled(); }
+                if (should_refresh_lockled) { akc_led_refresh_lockled(); }
+                if (should_refresh_layerled) { akc_led_refresh_layerled(); }
+                if (should_init_lockled) { akc_led_init_lockled(); }
+                if (should_init_layerled) { akc_led_init_layerled(); }
                 break;
             }
             case id_custom_save: {
-                akc_via_config_save();
+                akc_via_save_config();
                 break;
             }
             default:

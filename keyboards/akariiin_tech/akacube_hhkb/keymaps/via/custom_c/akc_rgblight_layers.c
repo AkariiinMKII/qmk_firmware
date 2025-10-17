@@ -86,8 +86,8 @@ static void set_rgblight_layer_color(rgblight_segment_t* segment, uint8_t start_
 
 void akc_rgblight_layers_init(void) {
     // Load VIA config colors
-    HSV layer_bg_color = akc_pick_dim_color(akc_via_get_config(LAYER_LED, OFF_COLOR));
-    HSV layer_on_color = akc_pick_dim_color(akc_via_get_config(LAYER_LED, ON_COLOR));
+    HSV layer_bg_color = akc_color_pick_dim_color(akc_via_get_config(LAYER_LED, OFF_COLOR));
+    HSV layer_on_color = akc_color_pick_dim_color(akc_via_get_config(LAYER_LED, ON_COLOR));
 
     for (uint8_t i = 1; i < 8; i += 2) {
         set_rgblight_layer_color(&akc_layer_layerled_bg[i], i, 1, layer_bg_color);
@@ -109,7 +109,7 @@ void akc_rgblight_layers_init(void) {
         akc_layer_lockled_bg2
     };
     for (uint8_t i = 0; i < 3; i++) {
-        HSV lock_bg_color = akc_pick_dim_color(akc_via_get_config(i, OFF_COLOR));
+        HSV lock_bg_color = akc_color_pick_dim_color(akc_via_get_config(i, OFF_COLOR));
         set_rgblight_layer_color(lock_bg_segments[i], i * 3, 2, lock_bg_color);
     }
 
@@ -119,7 +119,7 @@ void akc_rgblight_layers_init(void) {
         akc_layer_lockled_2
     };
     for (uint8_t i = 0; i < 3; i++) {
-        HSV lock_on_color = akc_pick_dim_color(akc_via_get_config(i, ON_COLOR));
+        HSV lock_on_color = akc_color_pick_dim_color(akc_via_get_config(i, ON_COLOR));
         set_rgblight_layer_color(lock_on_segments[i], i * 3, 2, lock_on_color);
     }
 
