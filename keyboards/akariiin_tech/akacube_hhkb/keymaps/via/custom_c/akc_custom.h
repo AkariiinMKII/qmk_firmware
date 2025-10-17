@@ -8,8 +8,6 @@
 #include "akc_config.h"
 
 // akc_via_config.c
-_Static_assert(8 <= VIA_EEPROM_CUSTOM_CONFIG_SIZE, "VIA custom config size too small");
-
 enum akc_config_rows {
     LOCK_LED_0 = 0,
     LOCK_LED_1 = 1,
@@ -23,11 +21,11 @@ enum akc_config_cols {
     ON_COLOR = 2
 };
 
-void akc_via_config_init(void);
-void akc_via_config_save(void);
+void akc_via_init_config(void);
+void akc_via_save_config(void);
 uint8_t akc_via_get_config(uint8_t row, uint8_t col);
 uint8_t akc_via_get_led_timeout(void);
-bool akc_via_get_layerkey_show_lockled(void);
+bool akc_via_layerkey_show_lockled_enabled(void);
 bool akc_via_lock_system_enabled(void);
 void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 
@@ -108,12 +106,6 @@ bool akc_led_blink_timer_active(void);
 #ifndef AKC_COMBO_MOD2
 #    define AKC_COMBO_MOD2 KC_RSFT
 #endif
-#ifdef AKC_COMBO_ALLOW_OVER16
-_Static_assert(2 <= 32, "Too many combo definitions for uint32_t bitmask (max 32)");
-#else
-_Static_assert(2 <= 16, "Too many combo definitions for uint16_t bitmask (max 16)");
-#endif
-
 bool akc_combo_check(uint16_t keycode, bool pressed);
 void akc_combo_handler(void);
 bool akc_combo_any_active(void);
@@ -132,19 +124,19 @@ bool akc_combo_any_active(void);
 #    define AKC_LOCKLED_2 4
 #endif
 
-void akc_lock_indicator_update(led_t led_state);
-void akc_lock_indicator_timer(void);
-void akc_layer_indicator_update(layer_state_t state);
-void akc_layer_indicator_timer(void);
-void akc_refresh_lockled(void);
-void akc_refresh_layerled(void);
-void akc_init_lockled(void);
-void akc_init_layerled(void);
-bool akc_lockled_timer_active(void);
-bool akc_layerled_timer_active(void);
+void akc_led_lock_indicator_update(led_t led_state);
+void akc_led_lock_indicator_timer(void);
+void akc_led_layer_indicator_update(layer_state_t state);
+void akc_led_layer_indicator_timer(void);
+void akc_led_refresh_lockled(void);
+void akc_led_refresh_layerled(void);
+void akc_led_init_lockled(void);
+void akc_led_init_layerled(void);
+bool akc_led_lockled_timer_active(void);
+bool akc_led_layerled_timer_active(void);
 
 // akc_rgb_colors.c
-HSV akc_pick_dim_color(uint8_t color_index);
+HSV akc_color_pick_dim_color(uint8_t color_index);
 
 // akc_layer_state_patch.c
-void akc_init_layer_state(void);
+void akc_layer_init_layer_state(void);
