@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
-#include "custom_c/akc_custom.h"
+#include "akc_custom/akc_custom.h"
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {

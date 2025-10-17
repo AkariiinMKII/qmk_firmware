@@ -15,12 +15,12 @@ VIA_ENABLE = yes             # VIA keymap configuration support
 WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling
 
 # ------------------ User Space Source Files ------------------
-SRC += custom_c/akc_rgb_colors.c      # RGB color definitions
-SRC += custom_c/akc_rgblight_layers.c # RGB light layer management
-SRC += custom_c/akc_led_control.c     # LED control coordination
-SRC += custom_c/akc_layer_indicator.c # Layer indicator system library
-SRC += custom_c/akc_lock_indicator.c  # Lock indicator system library
-SRC += custom_c/akc_led_blink.c       # LED blink effects
-SRC += custom_c/akc_combo.c           # Combo key sequences
-SRC += custom_c/akc_via_config.c       # VIA configuration system
-SRC += custom_c/akc_layer_state_patch.c # Layer state initialization fix
+SRC += akc_custom/akc_rgb_colors.c      # RGB color definitions
+SRC += akc_custom/akc_rgblight_layers.c # RGB light layer management
+SRC += akc_custom/akc_led_control.c     # LED control coordination
+SRC += akc_custom/akc_layer_indicator.c # Layer indicator system library
+SRC += akc_custom/akc_lock_indicator.c  # Lock indicator system library
+SRC += akc_custom/akc_led_blink.c       # LED blink effects
+SRC += akc_custom/akc_combo.c           # Combo key sequences
+SRC += akc_custom/akc_via_config.c       # VIA configuration system
+SRC += akc_custom/akc_layer_state_patch.c # Layer state initialization fix
