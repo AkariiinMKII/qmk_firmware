@@ -1,8 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_lock_indicator.h"
-#include "akc_via_config.h"
+#include "akc_custom.h"
 
 // Show lock indicators - black background if any enabled, color backgrounds if enabled, indicators if active
 void akc_lock_indicator_show(uint8_t lock_state) {

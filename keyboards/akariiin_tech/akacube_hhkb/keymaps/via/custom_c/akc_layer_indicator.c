@@ -1,7 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_layer_indicator.h"
+#include "akc_custom.h"
 
 // Show layer indicators with bit checks
 void akc_layer_indicator_show(layer_state_t state) {

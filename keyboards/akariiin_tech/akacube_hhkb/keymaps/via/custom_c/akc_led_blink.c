@@ -1,7 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_led_blink.h"
+#include "akc_custom.h"
 
 // Blink timing and state
 static bool blink_active = false;

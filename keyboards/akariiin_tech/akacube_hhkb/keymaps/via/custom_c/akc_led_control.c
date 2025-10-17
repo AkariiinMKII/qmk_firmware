@@ -1,11 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_led_control.h"
-#include "akc_via_config.h"
-#include "akc_rgblight_layers.h"
-#include "akc_lock_indicator.h"
-#include "akc_layer_indicator.h"
+#include "akc_custom.h"
 
 // Lock LED state variables
 static uint8_t lock_last_state = 0;
