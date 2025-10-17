@@ -1,0 +1,147 @@
+// Copyright 2025 AkariiinL (@AkariiinMKII)
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#pragma once
+
+#include "quantum.h"
+#include "via.h"
+#include "akc_config.h"
+
+// akc_via_config.c
+_Static_assert(8 <= VIA_EEPROM_CUSTOM_CONFIG_SIZE, "VIA custom config size too small");
+
+enum akc_config_rows {
+    LOCK_LED_0 = 0,
+    LOCK_LED_1 = 1,
+    LOCK_LED_2 = 2,
+    LAYER_LED = 3
+};
+
+enum akc_config_cols {
+    BITMASK = 0,
+    OFF_COLOR = 1,
+    ON_COLOR = 2
+};
+
+void akc_via_config_init(void);
+void akc_via_config_save(void);
+uint8_t akc_via_get_config(uint8_t row, uint8_t col);
+uint8_t akc_via_get_led_timeout(void);
+bool akc_via_get_layerkey_show_lockled(void);
+bool akc_via_lock_system_enabled(void);
+void via_custom_value_command_kb(uint8_t *data, uint8_t length);
+
+// akc_rgblight_layers.c
+#ifndef AKC_COLOR_LAYERLED_BG
+#    define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM
+#endif
+#ifndef AKC_COLOR_LAYERLED_MO0
+#    define AKC_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
+#endif
+#ifndef AKC_COLOR_LAYERLED_MO1
+#    define AKC_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
+#endif
+#ifndef AKC_COLOR_LAYERLED_MO2
+#    define AKC_COLOR_LAYERLED_MO2    HSV_BLUE_DIM
+#endif
+#ifndef AKC_COLOR_LAYERLED_MO3
+#    define AKC_COLOR_LAYERLED_MO3    HSV_BLUE_DIM
+#endif
+#ifndef AKC_COLOR_LOCKLED_BG
+#    define AKC_COLOR_LOCKLED_BG      HSV_RED_DIM
+#endif
+#ifndef AKC_COLOR_LOCKLED_0
+#    define AKC_COLOR_LOCKLED_0       HSV_GREEN_DIM
+#endif
+#ifndef AKC_COLOR_LOCKLED_1
+#    define AKC_COLOR_LOCKLED_1       HSV_GREEN_DIM
+#endif
+#ifndef AKC_COLOR_LOCKLED_2
+#    define AKC_COLOR_LOCKLED_2       HSV_GREEN_DIM
+#endif
+#ifndef AKC_COLOR_BLINK
+#    define AKC_COLOR_BLINK           HSV_RED_DIM
+#endif
+#if AKC_LOCKLED_0 > 0
+#    define AKC_COLOR_LOCKLED_BG0 AKC_COLOR_LOCKLED_BG
+#else
+#    define AKC_COLOR_LOCKLED_BG0 HSV_BLACK
+#endif
+#if AKC_LOCKLED_1 > 0
+#    define AKC_COLOR_LOCKLED_BG1 AKC_COLOR_LOCKLED_BG
+#else
+#    define AKC_COLOR_LOCKLED_BG1 HSV_BLACK
+#endif
+#if AKC_LOCKLED_2 > 0
+#    define AKC_COLOR_LOCKLED_BG2 AKC_COLOR_LOCKLED_BG
+#else
+#    define AKC_COLOR_LOCKLED_BG2 HSV_BLACK
+#endif
+
+void akc_rgblight_layers_init(void);
+
+// akc_layer_indicator.c
+void akc_layer_indicator_show(layer_state_t state);
+void akc_layer_indicator_hide(void);
+
+// akc_lock_indicator.c
+void akc_lock_indicator_show(uint8_t lock_state);
+void akc_lock_indicator_hide(void);
+
+// akc_led_blink.c
+#ifndef AKC_BLINK_TIME_ON
+#    define AKC_BLINK_TIME_ON 200
+#endif
+#ifndef AKC_BLINK_TIME_IDLE
+#    define AKC_BLINK_TIME_IDLE 200
+#endif
+
+void akc_led_blink_show(void);
+void akc_led_blink_hide(void);
+void akc_led_blink_timer(void);
+bool akc_led_blink_timer_active(void);
+
+// akc_combo.c
+#ifndef AKC_COMBO_MOD1
+#    define AKC_COMBO_MOD1 KC_LSFT
+#endif
+#ifndef AKC_COMBO_MOD2
+#    define AKC_COMBO_MOD2 KC_RSFT
+#endif
+#ifdef AKC_COMBO_ALLOW_OVER16
+_Static_assert(2 <= 32, "Too many combo definitions for uint32_t bitmask (max 32)");
+#else
+_Static_assert(2 <= 16, "Too many combo definitions for uint16_t bitmask (max 16)");
+#endif
+
+bool akc_combo_check(uint16_t keycode, bool pressed);
+void akc_combo_handler(void);
+bool akc_combo_any_active(void);
+
+// akc_led_control.c
+#ifndef AKC_LED_KEEPTIME
+#    define AKC_LED_KEEPTIME 1500
+#endif
+#ifndef AKC_LOCKLED_0
+#    define AKC_LOCKLED_0 1
+#endif
+#ifndef AKC_LOCKLED_1
+#    define AKC_LOCKLED_1 2
+#endif
+#ifndef AKC_LOCKLED_2
+#    define AKC_LOCKLED_2 4
+#endif
+
+void akc_lock_indicator_update(led_t led_state);
+void akc_lock_indicator_timer(void);
+void akc_layer_indicator_update(layer_state_t state);
+void akc_layer_indicator_timer(void);
+void akc_refresh_lockled(void);
+void akc_refresh_layerled(void);
+void akc_init_lockled(void);
+void akc_init_layerled(void);
+bool akc_lockled_timer_active(void);
+bool akc_layerled_timer_active(void);
+
+// akc_rgb_colors.c
+HSV akc_pick_dim_color(uint8_t color_index);

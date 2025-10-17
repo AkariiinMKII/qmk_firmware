@@ -1,9 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_rgblight_layers.h"
-#include "akc_rgb_colors.h"
-#include "akc_via_config.h"
+#include "akc_custom.h"
 
 // RGB Layer Definitions (ordered by priority: lowest → highest)
 
@@ -60,7 +58,7 @@ static const rgblight_segment_t PROGMEM akc_layer_blink[] = RGBLIGHT_LAYER_SEGME
 
 // Layer mapping array
 // Priority order: layer background → layer indicators → lock black bg → lock color bgs → lock indicators → blink layers
-const rgblight_segment_t* const PROGMEM akc_rgblight_layers[] = RGBLIGHT_LAYERS_LIST(
+static const rgblight_segment_t* const PROGMEM akc_rgblight_layers[] = RGBLIGHT_LAYERS_LIST(
     akc_layer_layerled_bg,            // 0: Layer background
     akc_layer_layerled_mo0,           // 1: Layer 0
     akc_layer_layerled_mo1,           // 2: Layer 1
