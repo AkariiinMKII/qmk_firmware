@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_rgb_colors.h"
+#include "akc_custom.h"
 
 // Convert color index to HSV value
 HSV akc_pick_dim_color(uint8_t color_index) {

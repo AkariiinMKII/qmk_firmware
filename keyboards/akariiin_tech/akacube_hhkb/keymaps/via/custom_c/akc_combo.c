@@ -1,7 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_combo.h"
+#include "akc_custom.h"
 
 // Types
 typedef struct {

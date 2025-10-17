@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
-
-#include "custom_c/akc_via_config.h"
-#include "custom_c/akc_rgblight_layers.h"
-#include "custom_c/akc_led_control.h"
-#include "custom_c/akc_combo.h"
-#include "custom_c/akc_led_blink.h"
+#include "custom_c/akc_custom.h"
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {

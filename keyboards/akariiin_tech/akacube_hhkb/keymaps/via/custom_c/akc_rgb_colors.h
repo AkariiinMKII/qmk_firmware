@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "quantum.h"
-
 // Brightness levels
 #define HSV_VAL_DIM      96   // Dimmed brightness level
 #define HSV_VAL_BRIGHT   192  // Bright brightness level

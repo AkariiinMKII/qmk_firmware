@@ -1,8 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_via_config.h"
-#include "akc_config.h"
+#include "akc_custom.h"
 
 // Forward declarations from akc_led_control
 void akc_refresh_lockled(void);
