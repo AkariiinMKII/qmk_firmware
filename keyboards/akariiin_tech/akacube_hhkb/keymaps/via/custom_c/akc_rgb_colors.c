@@ -5,7 +5,7 @@
 #include "akc_custom.h"
 
 // Convert color index to HSV value
-HSV akc_pick_dim_color(uint8_t color_index) {
+HSV akc_color_pick_dim_color(uint8_t color_index) {
     switch (color_index) {
         // Index 0 reserved for EEPROM reset detection
         case 1:  return (HSV){HSV_RED_DIM};     // Red

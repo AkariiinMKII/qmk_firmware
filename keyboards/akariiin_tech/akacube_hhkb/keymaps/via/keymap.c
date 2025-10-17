@@ -6,20 +6,20 @@
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
-    akc_init_layer_state();  // Workaround for layer_state initialization issue
-    akc_via_config_init();  // Load VIA configuration
-    akc_init_lockled();  // Initialize RGB layers with VIA colors
+    akc_layer_init_layer_state();  // Workaround for layer_state initialization issue
+    akc_via_init_config();  // Load VIA configuration
+    akc_led_init_lockled();  // Initialize RGB layers with VIA colors
 }
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {
-    akc_lock_indicator_update(led_state);
+    akc_led_lock_indicator_update(led_state);
     return true;
 }
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
-    akc_layer_indicator_update(state);
+    akc_led_layer_indicator_update(state);
     return state;
 }
 
@@ -30,8 +30,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Handle LED timeouts and combo updates
 void matrix_scan_user(void) {
-    if (akc_lockled_timer_active()) { akc_lock_indicator_timer(); }
-    if (akc_layerled_timer_active()) { akc_layer_indicator_timer(); }
+    if (akc_led_lockled_timer_active()) { akc_led_lock_indicator_timer(); }
+    if (akc_led_layerled_timer_active()) { akc_led_layer_indicator_timer(); }
     if (akc_combo_any_active()) { akc_combo_handler(); }
     if (akc_led_blink_timer_active()) { akc_led_blink_timer(); }
 }
