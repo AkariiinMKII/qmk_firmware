@@ -23,3 +23,4 @@ SRC += custom_c/akc_lock_indicator.c  # Lock indicator system library
 SRC += custom_c/akc_led_blink.c       # LED blink effects
 SRC += custom_c/akc_combo.c           # Combo key sequences
 SRC += custom_c/akc_via_config.c       # VIA configuration system
+SRC += custom_c/akc_layer_state_patch.c # Layer state initialization fix
