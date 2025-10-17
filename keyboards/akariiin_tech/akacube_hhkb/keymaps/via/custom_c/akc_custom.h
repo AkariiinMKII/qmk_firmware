@@ -145,3 +145,6 @@ bool akc_layerled_timer_active(void);
 
 // akc_rgb_colors.c
 HSV akc_pick_dim_color(uint8_t color_index);
+
+// akc_layer_state_patch.c
+void akc_init_layer_state(void);

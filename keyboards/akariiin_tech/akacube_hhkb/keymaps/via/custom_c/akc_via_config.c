@@ -66,19 +66,6 @@ static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
     return (row <= 3 && col <= 2);
 }
 
-static bool is_valid_default_layer(uint32_t mask) {
-    return (mask == 1 || mask == 2 || mask == 4 || mask == 8);
-}
-
-// Workaround for layer_state initialization issue
-static void init_layer_state(void) {
-    if (!is_valid_default_layer(default_layer_state)) {
-        default_layer_set(1);  // Reset to layer 0 if invalid
-    }
-
-    layer_state |= default_layer_state;
-}
-
 // Data packing/unpacking functions
 // 64-bit EEPROM: [63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
 // 16-bit pack: [15:12 color_on][11:8 color_off][7:0 flag/timeout]
@@ -223,8 +210,6 @@ void akc_via_config_init(void) {
             eesave_config_matrix_row(row);
         }
     }
-
-    init_layer_state();
 
     config_loaded = true;
 }

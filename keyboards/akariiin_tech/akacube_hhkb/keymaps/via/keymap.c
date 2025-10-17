@@ -6,6 +6,7 @@
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
+    akc_init_layer_state();  // Workaround for layer_state initialization issue
     akc_via_config_init();  // Load VIA configuration
     akc_init_lockled();  // Initialize RGB layers with VIA colors
 }
