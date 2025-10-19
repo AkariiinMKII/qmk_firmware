@@ -6,10 +6,19 @@
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
-    akc_layer_init_layer_state();  // Workaround for layer_state initialization issue
+    akc_env_init_layer_state();  // Workaround for layer_state initialization issue
     akc_via_init_config();  // Load VIA configuration
     akc_led_init_lockled();  // Initialize RGB layers with VIA colors
 }
+
+#ifdef OS_DETECTION_ENABLE
+// Re-init LEDs after OS detection.
+bool process_detected_host_os_user(os_variant_t host_os) {
+    if (host_os == OS_UNSURE) return true;
+    akc_led_init_lockled();
+    return true;
+}
+#endif
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {

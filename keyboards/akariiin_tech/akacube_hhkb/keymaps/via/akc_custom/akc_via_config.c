@@ -227,6 +227,11 @@ bool akc_via_layerkey_show_lockled_enabled(void) {
 }
 
 bool akc_via_lock_system_enabled(void) {
+#ifdef OS_DETECTION_ENABLE
+    os_variant_t host_os = detected_host_os();
+    bool os_supported = (host_os == OS_WINDOWS || host_os == OS_LINUX);
+    if (!os_supported) return false;
+#endif
     return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
 }
 
