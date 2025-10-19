@@ -140,3 +140,6 @@ HSV akc_color_pick_dim_color(uint8_t color_index);
 
 // akc_env_patch.c
 void akc_env_init_layer_state(void);
+#ifdef OS_DETECTION_ENABLE
+void akc_env_setup_swap_ag(os_variant_t host_os);
+#endif

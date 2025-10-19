@@ -12,9 +12,10 @@ void keyboard_post_init_user(void) {
 }
 
 #ifdef OS_DETECTION_ENABLE
-// Re-init LEDs after OS detection.
+// OS-based configuration on host OS detection event
 bool process_detected_host_os_user(os_variant_t host_os) {
     if (host_os == OS_UNSURE) return true;
+    akc_env_setup_swap_ag(host_os);
     akc_led_init_lockled();
     return true;
 }
@@ -57,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────┬───┤
      * │ Shift  │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ / │ Shift│MO1│
      * └─────┬──┴┬──┴──┬┴───┴───┴───┴───┴───┴───┴──┬┴───┴┬───┬─┴───┘
-     *       │Alt│ GUI │                           │ GUI │Alt│
+     *       │GUI│ Alt │                           │ Alt │GUI│
      *       └───┴─────┴───────────────────────────┴─────┴───┘
      */
     [0] = LAYOUT_hhkb(
@@ -65,7 +66,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSPC,
         KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,
         KC_LSFT,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, MO(1),
-                          KC_LALT, KC_LGUI, KC_NO,            KC_SPC,  KC_NO,                    KC_RGUI, KC_RALT
+                          KC_LGUI, KC_LALT, KC_NO,            KC_SPC,  KC_NO,                    KC_RALT, KC_RGUI
     ),
 
     // Layer 1: Function keys and media controls
@@ -79,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────┬───┤
      * │ Shift  │RGB│NXT│SPD│VlD│ B │ + │ - │End│PgD│ ↓ │ Shift│MO1│
      * └─────┬──┴┬──┴──┬┴───┴───┴───┴───┴───┴───┴──┬┴───┴┬───┬─┴───┘
-     *       │Alt│ GUI │                           │ GUI │Alt│
+     *       │GUI│ Alt │                           │ Alt │GUI│
      *       └───┴─────┴───────────────────────────┴─────┴───┘
      */
     [1] = LAYOUT_hhkb(
