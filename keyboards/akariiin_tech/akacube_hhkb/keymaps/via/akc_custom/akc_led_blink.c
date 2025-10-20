@@ -15,8 +15,8 @@ void akc_led_blink_show(void) {
         blink_led_on = true;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(12, true);  // Background layer
-        rgblight_set_layer_state(13, true);  // Color layer
+        rgblight_set_layer_state(13, true);  // Background layer
+        rgblight_set_layer_state(14, true);  // Blink color layer
     }
 }
 
@@ -27,8 +27,8 @@ void akc_led_blink_hide(void) {
         blink_led_on = false;
         blink_timer = 0;
 
-        rgblight_set_layer_state(12, false); // Background layer off
-        rgblight_set_layer_state(13, false); // Color layer off
+        rgblight_set_layer_state(13, false); // Background layer off
+        rgblight_set_layer_state(14, false); // Blink color layer off
     }
 }
 
@@ -41,7 +41,7 @@ void akc_led_blink_timer(void) {
         blink_led_on = !blink_led_on;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(13, blink_led_on);  // Toggle color layer
+        rgblight_set_layer_state(14, blink_led_on);  // Toggle blink color layer
     }
 }
 
