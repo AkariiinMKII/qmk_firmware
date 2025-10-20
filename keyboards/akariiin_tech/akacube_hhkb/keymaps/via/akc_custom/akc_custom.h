@@ -60,6 +60,26 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 #ifndef AKC_COLOR_BLINK
 #    define AKC_COLOR_BLINK           HSV_RED_DIM
 #endif
+#ifndef AKC_LAYERLED_POSITIONS
+#    define AKC_LAYERLED_POSITIONS {0, 1, 2, 3}
+#endif
+#ifndef AKC_LAYERLED_LENGTH
+#    define AKC_LAYERLED_LENGTH 1
+#endif
+#if AKC_LAYERLED_LENGTH < 1
+#    undef AKC_LAYERLED_LENGTH
+#    define AKC_LAYERLED_LENGTH 1
+#endif
+#ifndef AKC_LOCKLED_POSITIONS
+#    define AKC_LOCKLED_POSITIONS {0, 1, 2}
+#endif
+#ifndef AKC_LOCKLED_LENGTH
+#    define AKC_LOCKLED_LENGTH 1
+#endif
+#if AKC_LOCKLED_LENGTH < 1
+#    undef AKC_LOCKLED_LENGTH
+#    define AKC_LOCKLED_LENGTH 1
+#endif
 #if AKC_LOCKLED_0 > 0
 #    define AKC_COLOR_LOCKLED_BG0 AKC_COLOR_LOCKLED_BG
 #else

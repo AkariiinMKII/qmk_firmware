@@ -13,38 +13,59 @@ void akc_led_blink_show(void);
 void akc_led_blink_hide(void);
 
 
-// ==================== OS COMPATIBILITY ====================
+// =================== OS COMPATIBILITY ====================
 
-// Auto Alt/GUI swap configuration
-// - Enable automatic modifier key swap based on detected OS
-// - Swaps Alt/GUI keys for macOS/iOS compatibility
+// OS-based auto Alt/GUI swap configuration
+// - Swap Alt/GUI keys for macOS/iOS
 #define AKC_AUTO_SWAP_AG
 
 
-// ===================== RGB LED COLORS =====================
+// ==================== RGB LED COLORS =====================
 
 // Layer indicator colors
-#define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM
+#define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM  // Off state color
 #define AKC_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO2    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO3    HSV_BLUE_DIM
 
 // Lock indicator colors
-#define AKC_COLOR_LOCKLED_BG      HSV_RED_DIM   // Stands for lock off
-#define AKC_COLOR_LOCKLED_0       HSV_GREEN_DIM  // Lock LED 0
-#define AKC_COLOR_LOCKLED_1       HSV_GREEN_DIM  // Lock LED 1
-#define AKC_COLOR_LOCKLED_2       HSV_GREEN_DIM  // Lock LED 2
+#define AKC_COLOR_LOCKLED_BG      HSV_RED_DIM   // Off state color
+#define AKC_COLOR_LOCKLED_0       HSV_GREEN_DIM
+#define AKC_COLOR_LOCKLED_1       HSV_GREEN_DIM
+#define AKC_COLOR_LOCKLED_2       HSV_GREEN_DIM
 
 // Blink effect color
 #define AKC_COLOR_BLINK           HSV_RED_DIM
 
 
-// ================== LOCK INDICATOR SYSTEM ==================
+// ================ LAYER INDICATOR SYSTEM =================
+
+// Indicator positions for 4 keymap layers
+// - Starting number of LEDs for each layer indicator (layer 0,1,2,3)
+// - LEDs count starts from 0
+#define AKC_LAYERLED_POSITIONS {1, 3, 5, 7}
+
+// Layer LED length
+// - Number of LEDs used for each indicator
+// - Should not be greater than the step to next position
+#define AKC_LAYERLED_LENGTH 1
+
+
+// ================= LOCK INDICATOR SYSTEM =================
 // Note: Due to API limitations, lock indicators may not work properly on some operating systems
 
+// Indicator positions for 3 lock states
+// - Starting number of LEDs for each lock indicator (lock 0,1,2)
+// - LEDs count starts from 0
+#define AKC_LOCKLED_POSITIONS {0, 3, 6}
+
+// Lock LED length
+// - Number of LEDs used for each indicator
+// - Should not be greater than the step to next position
+#define AKC_LOCKLED_LENGTH 2
+
 // Lock LED mapping configuration
-// - Hardware positions: AKC_LOCKLED_0=LED 0-1 (left), AKC_LOCKLED_1=LED 3-4 (middle), AKC_LOCKLED_2=LED 6-7 (right)
 // - Available values: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
 // - Setting all LOCKLEDs to 0 will disable the entire lock indicator system and force enable layer indicators
 #define AKC_LOCKLED_0 1  // numlock
@@ -56,7 +77,7 @@ void akc_led_blink_hide(void);
 #define AKC_LED_KEEPTIME 1500
 
 
-// ==================== LED BLINK SYSTEM =====================
+// =================== LED BLINK SYSTEM ====================
 
 // Blink effect configuration
 // - Time of LED on and off in a blink cycle (ms)
@@ -64,7 +85,7 @@ void akc_led_blink_hide(void);
 #define AKC_BLINK_TIME_IDLE 200    // Blink off time
 
 
-// ====================== COMBO SYSTEM =======================
+// ===================== COMBO SYSTEM ======================
 
 // Combo configuration
 // - Support up to 16 combos by default (better performance)
