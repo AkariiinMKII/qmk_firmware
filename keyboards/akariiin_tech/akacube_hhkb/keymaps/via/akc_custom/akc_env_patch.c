@@ -16,7 +16,7 @@ void akc_env_init_layer_state(void) {
     layer_state |= default_layer_state;
 }
 
-#ifdef OS_DETECTION_ENABLE
+#ifdef AKC_AUTO_SWAP_AG
 #include "eeconfig.h"
 
 // OS-based Alt/GUI swap configuration
