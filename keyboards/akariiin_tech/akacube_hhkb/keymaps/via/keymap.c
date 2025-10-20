@@ -11,15 +11,15 @@ void keyboard_post_init_user(void) {
     akc_led_init_lockled();  // Initialize RGB layers with VIA colors
 }
 
-#ifdef OS_DETECTION_ENABLE
 // OS-based configuration on host OS detection event
 bool process_detected_host_os_user(os_variant_t host_os) {
     if (host_os == OS_UNSURE) return true;
+#ifdef AKC_AUTO_SWAP_AG
     akc_env_setup_swap_ag(host_os);
+#endif
     akc_led_init_lockled();
     return true;
 }
-#endif
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {

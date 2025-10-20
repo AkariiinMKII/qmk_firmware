@@ -13,7 +13,15 @@ void akc_led_blink_show(void);
 void akc_led_blink_hide(void);
 
 
-// ================== RGB LED COLORS ==================
+// ==================== OS COMPATIBILITY ====================
+
+// Auto Alt/GUI swap configuration
+// - Enable automatic modifier key swap based on detected OS
+// - Swaps Alt/GUI keys for macOS/iOS compatibility
+#define AKC_AUTO_SWAP_AG
+
+
+// ===================== RGB LED COLORS =====================
 
 // Layer indicator colors
 #define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM
@@ -32,7 +40,7 @@ void akc_led_blink_hide(void);
 #define AKC_COLOR_BLINK           HSV_RED_DIM
 
 
-// ================ LOCK INDICATOR SYSTEM ================
+// ================== LOCK INDICATOR SYSTEM ==================
 // Note: Due to API limitations, lock indicators may not work properly on some operating systems
 
 // Lock LED mapping configuration
@@ -48,7 +56,7 @@ void akc_led_blink_hide(void);
 #define AKC_LED_KEEPTIME 1500
 
 
-// ================== LED BLINK SYSTEM ==================
+// ==================== LED BLINK SYSTEM =====================
 
 // Blink effect configuration
 // - Time of LED on and off in a blink cycle (ms)
@@ -56,7 +64,7 @@ void akc_led_blink_hide(void);
 #define AKC_BLINK_TIME_IDLE 200    // Blink off time
 
 
-// ================== COMBO SYSTEM ==================
+// ====================== COMBO SYSTEM =======================
 
 // Combo configuration
 // - Support up to 16 combos by default (better performance)
