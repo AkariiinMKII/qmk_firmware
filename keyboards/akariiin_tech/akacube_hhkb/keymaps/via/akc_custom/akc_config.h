@@ -1,8 +1,6 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// User configuration for custom features
-
 #pragma once
 
 #include "quantum.h"
@@ -12,6 +10,12 @@ bool akc_combo_any_active(void);
 void akc_led_blink_show(void);
 void akc_led_blink_hide(void);
 
+// =========================================================
+// ================== USER CONFIGURATION ===================
+// =========================================================
+
+// NOTE: Some definitions serve as default fallback values.
+// When VIA is used, these values are overwritten by user configurations from VIA.
 
 // =================== OS COMPATIBILITY ====================
 
@@ -19,17 +23,16 @@ void akc_led_blink_hide(void);
 // - Swap Alt/GUI keys for macOS/iOS
 #define AKC_AUTO_SWAP_AG
 
-
 // ==================== RGB LED COLORS =====================
 
-// Layer indicator colors
+// Layer indicator colors (overwritten by VIA config)
 #define AKC_COLOR_LAYERLED_BG     HSV_RED_DIM  // Off state color
 #define AKC_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO2    HSV_BLUE_DIM
 #define AKC_COLOR_LAYERLED_MO3    HSV_BLUE_DIM
 
-// Lock indicator colors
+// Lock indicator colors (overwritten by VIA config)
 #define AKC_COLOR_LOCKLED_BG      HSV_RED_DIM   // Off state color
 #define AKC_COLOR_LOCKLED_0       HSV_GREEN_DIM
 #define AKC_COLOR_LOCKLED_1       HSV_GREEN_DIM
@@ -38,6 +41,11 @@ void akc_led_blink_hide(void);
 // Blink effect color
 #define AKC_COLOR_BLINK           HSV_RED_DIM
 
+// ===================== LED KEEP TIME =====================
+
+// LED timeout (overwritten by VIA config)
+// - Time to keep LED indicators on after state changes (ms)
+#define AKC_LED_KEEPTIME 1500
 
 // ================ LAYER INDICATOR SYSTEM =================
 
@@ -51,9 +59,9 @@ void akc_led_blink_hide(void);
 // - Should not be greater than the step to next position
 #define AKC_LAYERLED_LENGTH 1
 
-
 // ================= LOCK INDICATOR SYSTEM =================
-// Note: Due to API limitations, lock indicators may not work properly on some operating systems
+
+// NOTE: Due to API limitations, lock indicators are automatically disabled for macOS/iOS host.
 
 // Indicator positions for 3 lock states
 // - Starting number of LEDs for each lock indicator (lock 0,1,2)
@@ -65,25 +73,19 @@ void akc_led_blink_hide(void);
 // - Should not be greater than the step to next position
 #define AKC_LOCKLED_LENGTH 2
 
-// Lock LED mapping configuration
+// Lock LED mapping configuration (overwritten by VIA config)
 // - Available values: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
 // - Setting all LOCKLEDs to 0 will disable the entire lock indicator system and force enable layer indicators
 #define AKC_LOCKLED_0 1  // numlock
 #define AKC_LOCKLED_1 2  // capslock
 #define AKC_LOCKLED_2 4  // scrolllock
 
-// LED timeout
-// - Time to keep LED indicators on after state changes (ms)
-#define AKC_LED_KEEPTIME 1500
-
-
 // =================== LED BLINK SYSTEM ====================
 
 // Blink effect configuration
 // - Time of LED on and off in a blink cycle (ms)
-#define AKC_BLINK_TIME_ON   200    // Blink on time
-#define AKC_BLINK_TIME_IDLE 200    // Blink off time
-
+#define AKC_BLINK_TIME_ON   200
+#define AKC_BLINK_TIME_IDLE 200
 
 // ===================== COMBO SYSTEM ======================
 
@@ -100,9 +102,10 @@ void akc_led_blink_hide(void);
 #define AKC_COMBO_MOD2 KC_RSFT
 
 // Combo set definitions
+
 // Reset combo configuration
-#define AKC_RESET_COMBO_KEY KC_R          // Change reset key
-#define AKC_RESET_COMBO_TIME 5000         // Change reset timing
+#define AKC_RESET_COMBO_KEY KC_R          // Combo key
+#define AKC_RESET_COMBO_TIME 5000         // Hold time (ms)
 static inline void akc_reset_combo_on_complete(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
@@ -120,8 +123,8 @@ static inline void akc_reset_combo_on_reset(void) {
 }
 
 // Ciallo combo configuration
-#define AKC_CIALLO_COMBO_KEY KC_C         // Change ciallo key
-#define AKC_CIALLO_COMBO_TIME 3000        // Change ciallo timing
+#define AKC_CIALLO_COMBO_KEY KC_C         // Combo key
+#define AKC_CIALLO_COMBO_TIME 3000        // Hold time (ms)
 static inline void akc_ciallo_combo_on_complete(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
