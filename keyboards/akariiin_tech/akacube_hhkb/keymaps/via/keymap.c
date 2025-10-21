@@ -7,11 +7,11 @@
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
     akc_env_init_layer_state();  // Workaround for layer_state initialization issue
-    akc_via_init_config();  // Load VIA configuration
-    akc_led_init_lockled();  // Initialize RGB layers with VIA colors
+    akc_via_init_config();  // Load VIA configurations
+    akc_led_init_lockled();  // Initialize RGB light layers
 }
 
-// OS-based configuration on host OS detection event
+// OS-based configurations on host OS detection event
 bool process_detected_host_os_user(os_variant_t host_os) {
     if (host_os == OS_UNSURE) return true;
 #ifdef AKC_AUTO_SWAP_AG
@@ -33,12 +33,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-// Process key presses for combo detection
+// Process combo detection for key events
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return akc_combo_check(keycode, record->event.pressed);
 }
 
-// Handle LED timeouts and combo updates
+// Process LED timeouts and combo updates
 void matrix_scan_user(void) {
     if (akc_led_lockled_timer_active()) { akc_led_lock_indicator_timer(); }
     if (akc_led_layerled_timer_active()) { akc_led_layer_indicator_timer(); }
