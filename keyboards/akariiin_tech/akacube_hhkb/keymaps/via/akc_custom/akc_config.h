@@ -104,37 +104,37 @@ void akc_led_blink_hide(void);
 // Combo set definitions
 
 // Reset combo configuration
-#define AKC_RESET_COMBO_KEY KC_R          // Combo key
-#define AKC_RESET_COMBO_TIME 5000         // Hold time (ms)
-static inline void akc_reset_combo_on_complete(void) {
+#define AKC_COMBO_RESET_KEY KC_R          // Combo key
+#define AKC_COMBO_RESET_TIME 5000         // Hold time (ms)
+static inline void akc_combo_reset_on_complete(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
     }
     wait_ms(100);
     reset_keyboard();
 }
-static inline void akc_reset_combo_on_satisfied(void) {
+static inline void akc_combo_reset_on_satisfied(void) {
     akc_led_blink_show();
 }
-static inline void akc_reset_combo_on_reset(void) {
+static inline void akc_combo_reset_on_reset(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
     }
 }
 
 // Ciallo combo configuration
-#define AKC_CIALLO_COMBO_KEY KC_C         // Combo key
-#define AKC_CIALLO_COMBO_TIME 3000        // Hold time (ms)
-static inline void akc_ciallo_combo_on_complete(void) {
+#define AKC_COMBO_CIALLO_KEY KC_C         // Combo key
+#define AKC_COMBO_CIALLO_TIME 3000        // Hold time (ms)
+static inline void akc_combo_ciallo_on_complete(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
     }
     SEND_STRING("ciallo");
 }
-static inline void akc_ciallo_combo_on_satisfied(void) {
+static inline void akc_combo_ciallo_on_satisfied(void) {
     akc_led_blink_show();
 }
-static inline void akc_ciallo_combo_on_reset(void) {
+static inline void akc_combo_ciallo_on_reset(void) {
     if (!akc_combo_any_active()) {
         akc_led_blink_hide();
     }
@@ -147,6 +147,16 @@ static inline void akc_ciallo_combo_on_reset(void) {
 // - On_complete: called when combo being completed (all keys held for required time after being satisfied)
 // - On_satisfied (optional): called when combo being satisfied (modifier and combo keys pressed in required sequence)
 // - On_reset (optional): called when combo being reset (any modifier or combo key released after satisfaction and before completion)
-#define AKC_COMBO_DEFINITIONS \
-    {.key = AKC_RESET_COMBO_KEY, .hold_time = AKC_RESET_COMBO_TIME, .on_complete = akc_reset_combo_on_complete, .on_satisfied = akc_reset_combo_on_satisfied, .on_reset = akc_reset_combo_on_reset}, \
-    {.key = AKC_CIALLO_COMBO_KEY, .hold_time = AKC_CIALLO_COMBO_TIME, .on_complete = akc_ciallo_combo_on_complete, .on_satisfied = akc_ciallo_combo_on_satisfied, .on_reset = akc_ciallo_combo_on_reset}
+#define AKC_COMBO_DEFINITIONS { \
+    .key = AKC_COMBO_RESET_KEY, \
+    .hold_time = AKC_COMBO_RESET_TIME, \
+    .on_complete = akc_combo_reset_on_complete, \
+    .on_satisfied = akc_combo_reset_on_satisfied, \
+    .on_reset = akc_combo_reset_on_reset \
+}, { \
+    .key = AKC_COMBO_CIALLO_KEY, \
+    .hold_time = AKC_COMBO_CIALLO_TIME, \
+    .on_complete = akc_combo_ciallo_on_complete, \
+    .on_satisfied = akc_combo_ciallo_on_satisfied, \
+    .on_reset = akc_combo_ciallo_on_reset \
+}
