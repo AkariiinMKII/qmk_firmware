@@ -21,11 +21,17 @@ enum akc_config_cols {
     ON_COLOR = 2
 };
 
+enum akc_config_flags {
+    OVERRIDE_LAYERLED = 0,
+    AUTO_DISABLE = 1,
+    AUTO_SWAP = 2
+};
+
 void akc_via_init_config(void);
 void akc_via_save_config(void);
 uint8_t akc_via_get_config(uint8_t row, uint8_t col);
 uint8_t akc_via_get_led_timeout(void);
-bool akc_via_layerkey_show_lockled_enabled(void);
+bool akc_via_get_flag(uint8_t flag_index);
 bool akc_via_lock_system_enabled(void);
 void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 
@@ -160,6 +166,4 @@ HSV akc_color_pick_dim_color(uint8_t color_index);
 
 // akc_env_patch.c
 void akc_env_init_layer_state(void);
-#ifdef AKC_AUTO_SWAP_AG
 void akc_env_setup_swap_ag(os_variant_t host_os);
-#endif

@@ -14,10 +14,8 @@ void keyboard_post_init_user(void) {
 // OS-based configurations on host OS detection event
 bool process_detected_host_os_user(os_variant_t host_os) {
     if (host_os == OS_UNSURE) return true;
-#ifdef AKC_AUTO_SWAP_AG
-    akc_env_setup_swap_ag(host_os);
-#endif
-    akc_led_init_lockled();
+    if (akc_via_get_flag(AUTO_SWAP)) { akc_env_setup_swap_ag(host_os); }
+    if (akc_via_get_flag(AUTO_DISABLE)) { akc_led_init_lockled(); }
     return true;
 }
 
