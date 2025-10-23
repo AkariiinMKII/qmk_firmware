@@ -17,12 +17,6 @@ void akc_led_blink_hide(void);
 // NOTE: Some definitions serve as default fallback values.
 // When VIA is used, these values are overwritten by user configurations from VIA.
 
-// =================== OS COMPATIBILITY ====================
-
-// OS-based auto Alt/GUI swap configuration
-// - Swap Alt/GUI keys for macOS/iOS
-#define AKC_AUTO_SWAP_AG
-
 // ==================== RGB LED COLORS =====================
 
 // Layer indicator colors (overwritten by VIA config)

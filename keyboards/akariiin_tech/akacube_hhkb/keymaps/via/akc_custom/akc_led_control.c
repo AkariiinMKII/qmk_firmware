@@ -63,7 +63,7 @@ void akc_led_lock_indicator_update(led_t led_state) {
     if (lock_current_state != lock_last_state) {
         lock_last_state = lock_current_state;
         // Handle lock indicators override
-        if (layer_state != default_layer_state && akc_via_layerkey_show_lockled_enabled()) {
+        if (layer_state != default_layer_state && akc_via_get_flag(OVERRIDE_LAYERLED)) {
             lock_indicator_timer_reset();  // Disable timer on upper layer for indicator override
         } else {
             lock_indicator_timer_start();  // Otherwise start timer
@@ -78,7 +78,7 @@ void akc_led_layer_indicator_update(layer_state_t state) {
         layer_last_state = state;  // Keep layer state cache up to date
 
         // Handle lock indicators override
-        if (akc_via_lock_system_enabled() && akc_via_layerkey_show_lockled_enabled()) {
+        if (akc_via_lock_system_enabled() && akc_via_get_flag(OVERRIDE_LAYERLED)) {
             if (state != default_layer_state) {
                 // Layer key down: show lock indicators without timeout
                 lock_indicator_timer_reset();
@@ -134,7 +134,7 @@ void akc_led_refresh_lockled(void) {
 
 void akc_led_refresh_layerled(void) {
     if (layer_state != default_layer_state) {
-        if (akc_via_layerkey_show_lockled_enabled() && akc_via_lock_system_enabled()) {
+        if (akc_via_get_flag(OVERRIDE_LAYERLED) && akc_via_lock_system_enabled()) {
             akc_led_refresh_lockled();
         } else {
             lock_indicator_timer_reset();
@@ -143,7 +143,7 @@ void akc_led_refresh_layerled(void) {
             akc_led_layer_indicator_update(layer_state);
         }
     } else {
-        if (akc_via_layerkey_show_lockled_enabled() && akc_via_lock_system_enabled()) {
+        if (akc_via_get_flag(OVERRIDE_LAYERLED) && akc_via_lock_system_enabled()) {
             switch_layerled_to_lockled();
         } else {
             switch_lockled_to_layerled();
@@ -160,7 +160,7 @@ void akc_led_init_lockled(void) {
         akc_layer_indicator_show(layer_state);
     }
     if (!akc_via_lock_system_enabled()) return;
-    if (layer_state == default_layer_state || !akc_via_layerkey_show_lockled_enabled()) {
+    if (layer_state == default_layer_state || !akc_via_get_flag(OVERRIDE_LAYERLED)) {
         lock_indicator_timer_start();
     }
     akc_lock_indicator_show(host_keyboard_led_state().raw);
@@ -171,7 +171,7 @@ void akc_led_init_layerled(void) {
     lock_indicator_timer_reset();
     layer_indicator_timer_reset();
     akc_rgblight_layers_init();
-    if (akc_via_lock_system_enabled() && akc_via_layerkey_show_lockled_enabled()) {
+    if (akc_via_lock_system_enabled() && akc_via_get_flag(OVERRIDE_LAYERLED)) {
         if (layer_state != default_layer_state) {
             akc_lock_indicator_show(host_keyboard_led_state().raw);
         }

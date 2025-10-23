@@ -4,7 +4,7 @@
 #include "akc_custom.h"
 
 // Compile-time check to ensure VIA custom config space is sufficient
-_Static_assert(8 <= VIA_EEPROM_CUSTOM_CONFIG_SIZE, "VIA custom config size too small for configuration");
+_Static_assert(VIA_EEPROM_CUSTOM_CONFIG_SIZE >= 10, "VIA custom config size too small for configuration");
 
 // VIA Configuration Channel IDs
 enum via_config_channels {
@@ -25,23 +25,26 @@ enum lock_led_config_ids {
     LAYER_LED_COLOR_OFF = 9,
     LAYER_LED_COLOR_ON = 10,
     LOCK_LED_TIMEOUT_CONFIG = 11,
-    LAYERKEY_SHOW_LOCKLED_CONFIG = 12
+    FLAG_OVERRIDE_LAYERLED = 12,
+    FLAG_AUTO_DISABLE = 13,
+    FLAG_AUTO_SWAP = 14
 };
 
 // Configuration initialization flag
 static bool config_loaded = false;
 
-// Configuration matrix [4x3]:
+// Configuration matrix [5x3]:
 //      | col 0        | col 1           | col 2
 // -----+--------------+-----------------+----------------
 // row 0| lock0_mask   | lock0_off_color | lock0_on_color
 // row 1| lock1_mask   | lock1_off_color | lock1_on_color
 // row 2| lock2_mask   | lock2_off_color | lock2_on_color
-// row 3| flag|timeout | layer_off_color | layer_on_color
+// row 3| timeout      | layer_off_color | layer_on_color
+// row 4| flags        | reserved        | reserved
 //
 // Lock mask: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
-// Colors: 1-13 (0=EEPROM reset), EEPROM VIA custom config area: 8 bytes packed
-static uint8_t via_config[4][3];
+// Colors: 1-13 (0=EEPROM reset), EEPROM VIA custom config area: 10 bytes packed
+static uint8_t via_config[5][3];
 
 // Validation functions
 static bool is_valid_lock_led_value(uint8_t value) {
@@ -52,17 +55,22 @@ static bool is_valid_timeout_value(uint8_t value) {
     return (value >= 1 && value <= 100);
 }
 
+static bool is_valid_flag_group(uint8_t value) {
+    return (value & 0xF8) == 0x80;  // Bit 7 set (valid marker), bits 3-6 clear (reserved)
+}
+
 static bool is_valid_color_index(uint8_t value) {
     return (value >= 1 && value <= 14);
 }
 
 static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
-    return (row <= 3 && col <= 2);
+    if (row == 4 && col > 0) return false;
+    return (row <= 4 && col <= 2);
 }
 
 // Data packing/unpacking functions
-// 64-bit EEPROM: [63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
-// 16-bit pack: [15:12 color_on][11:8 color_off][7:0 flag/timeout]
+// 80-bit EEPROM: [79:64 flags][63:48 layer][47:32 lock2][31:16 lock1][15:0 lock0]
+// 16-bit pack: [15:12 color_on][11:8 color_off][7:0 timeout/flags/data]
 static uint16_t pack_matrix_row(uint8_t row_index) {
     return (uint16_t)via_config[row_index][0] |
            ((uint16_t)(via_config[row_index][1] & 0xF) << 8) |
@@ -75,30 +83,21 @@ static void unpack_matrix_row(uint16_t packed, uint8_t row_index) {
     via_config[row_index][2] = (uint8_t)((packed >> 12) & 0xF);
 }
 
-// Mixed timeout/flag manipulation functions
-static uint8_t pick_mixed_time(void) {
-    return via_config[3][0] & 0x7F;  // Lower 7 bits
-}
-
-static uint8_t pick_mixed_flag(void) {
-    return (via_config[3][0] >> 7) & 0x1;  // Upper 1 bit
-}
-
-static uint8_t merge_mixed_time(uint8_t new_timeout) {
-    uint8_t flag = pick_mixed_flag();
-    return (new_timeout & 0x7F) | (flag << 7);
-}
-
-static uint8_t merge_mixed_flag(uint8_t new_flag) {
-    uint8_t timeout = pick_mixed_time();
-    return (timeout & 0x7F) | ((new_flag & 0x1) << 7);
+// Flag access functions
+static uint8_t update_flag_bit(uint8_t bit_index, bool value) {
+    if (value) {
+        via_config[4][0] |= (1 << bit_index);
+    } else {
+        via_config[4][0] &= ~(1 << bit_index);
+    }
+    return via_config[4][0];
 }
 
 // VIA custom config I/O functions
 static void eeload_all_config(void) {
-    uint8_t config[8];
-    via_read_custom_config(config, 0, 8);
-    for (uint8_t row = 0; row < 4; row++) {
+    uint8_t config[10];
+    via_read_custom_config(config, 0, 10);
+    for (uint8_t row = 0; row < 5; row++) {
         uint8_t offset = row * 2;
         uint16_t packed = (uint16_t)config[offset] | ((uint16_t)config[offset + 1] << 8);
         unpack_matrix_row(packed, row);
@@ -106,14 +105,14 @@ static void eeload_all_config(void) {
 }
 
 static void eesave_all_config(void) {
-    uint8_t config[8];
-    for (uint8_t row = 0; row < 4; row++) {
+    uint8_t config[10];
+    for (uint8_t row = 0; row < 5; row++) {
         uint16_t packed = pack_matrix_row(row);
         uint8_t offset = row * 2;
         config[offset] = (uint8_t)(packed & 0xFF);
         config[offset + 1] = (uint8_t)((packed >> 8) & 0xFF);
     }
-    via_update_custom_config(config, 0, 8);
+    via_update_custom_config(config, 0, 10);
 }
 
 static void eesave_config_matrix_row(uint8_t row_index) {
@@ -135,7 +134,7 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
         return false;
     }
 
-    // Check if value is different
+    // Check for value change
     if (via_config[row_index][col_index] == new_value) {
         return false; // No change needed
     }
@@ -146,14 +145,14 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
         case 0:
             if (row_index < 3) {
                 is_valid = is_valid_lock_led_value(new_value);
+            } else if (row_index == 3) {
+                is_valid = is_valid_timeout_value(new_value);
             } else {
-                // For packed flag/timeout, validate the entire byte
-                uint8_t timeout = new_value & 0x7F;
-                is_valid = is_valid_timeout_value(timeout);
+                is_valid = is_valid_flag_group(new_value);
             }
             break;
         default:  // case 1, 2
-            is_valid = is_valid_color_index(new_value);  // Same for all rows
+            is_valid = is_valid_color_index(new_value);  // Only row 0-3 could reach here
             break;
     }
 
@@ -169,17 +168,18 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 void akc_via_init_config(void) {
     if (config_loaded) return;
 
-    static const uint8_t default_config[4][3] = {
-        {AKC_LOCKLED_0, 1, 5},  // 1: Red, 5: Green
-        {AKC_LOCKLED_1, 1, 5},  // 1: Red, 5: Green
-        {AKC_LOCKLED_2, 1, 5},  // 1: Red, 5: Green
-        {(AKC_LED_KEEPTIME / 100), 1, 9}  // 1: Red, 9: Blue
+    static const uint8_t default_config[5][3] = {
+        {AKC_LOCKLED_0, 1, 5},            // 1: Red, 5: Green
+        {AKC_LOCKLED_1, 1, 5},            // 1: Red, 5: Green
+        {AKC_LOCKLED_2, 1, 5},            // 1: Red, 5: Green
+        {(AKC_LED_KEEPTIME / 100), 1, 9}, // 1: Red, 9: Blue
+        {0x86, 0, 0}                      // row 4: flags (0b10000110: bit7=valid, bit2|1=flags) + reserved
     };
 
     eeload_all_config();
 
     // Validate loaded config per-row (handles corrupted data)
-    for (uint8_t row = 0; row < 4; row++) {
+    for (uint8_t row = 0; row < 5; row++) {
         bool should_reset_row = false;
 
         if (row < 3) {
@@ -189,11 +189,18 @@ void akc_via_init_config(void) {
                 !is_valid_color_index(via_config[row][2])) {
                 should_reset_row = true;
             }
-        } else {
-            // Validate misc row (row 3)
-            if (!is_valid_timeout_value(pick_mixed_time()) ||
+        } else if (row == 3) {
+            // Validate timeout row (row 3)
+            if (!is_valid_timeout_value(via_config[3][0]) ||
                 !is_valid_color_index(via_config[3][1]) ||
                 !is_valid_color_index(via_config[3][2])) {
+                should_reset_row = true;
+            }
+        } else {
+            // Validate flags row (row 4)
+            if (!is_valid_flag_group(via_config[4][0]) ||
+                via_config[4][1] > 0 ||
+                via_config[4][2] > 0) {
                 should_reset_row = true;
             }
         }
@@ -219,17 +226,19 @@ uint8_t akc_via_get_config(uint8_t row, uint8_t col) {
 }
 
 uint8_t akc_via_get_led_timeout(void) {
-    return pick_mixed_time();
+    return via_config[3][0];
 }
 
-bool akc_via_layerkey_show_lockled_enabled(void) {
-    return pick_mixed_flag() != 0;
+bool akc_via_get_flag(uint8_t flag_index) {
+    return (via_config[4][0] >> flag_index) & 0x1;
 }
 
 bool akc_via_lock_system_enabled(void) {
-    os_variant_t host_os = detected_host_os();
-    bool os_supported = (host_os == OS_WINDOWS || host_os == OS_LINUX);
-    if (!os_supported) return false;
+    if (akc_via_get_flag(1)) {
+        os_variant_t host_os = detected_host_os();
+        bool os_supported = (host_os == OS_WINDOWS || host_os == OS_LINUX);
+        if (!os_supported) return false;
+    }
     return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
 }
 
@@ -279,10 +288,16 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         value_data[0] = via_config[3][2];
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
-                        value_data[0] = pick_mixed_time();
+                        value_data[0] = via_config[3][0];
                         break;
-                    case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        value_data[0] = pick_mixed_flag();
+                    case FLAG_OVERRIDE_LAYERLED:
+                        value_data[0] = akc_via_get_flag(0);
+                        break;
+                    case FLAG_AUTO_DISABLE:
+                        value_data[0] = akc_via_get_flag(1);
+                        break;
+                    case FLAG_AUTO_SWAP:
+                        value_data[0] = akc_via_get_flag(2);
                         break;
                     default:
                         *command_id = id_unhandled;
@@ -330,10 +345,21 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         should_init_layerled = via_update_config(3, 2, value_data[0]);
                         break;
                     case LOCK_LED_TIMEOUT_CONFIG:
-                        via_update_config(3, 0, merge_mixed_time(value_data[0]));
+                        via_update_config(3, 0, value_data[0]);
                         break;
-                    case LAYERKEY_SHOW_LOCKLED_CONFIG:
-                        should_refresh_layerled = via_update_config(3, 0, merge_mixed_flag(value_data[0]));
+                    case FLAG_OVERRIDE_LAYERLED:
+                        should_refresh_layerled = via_update_config(4, 0, update_flag_bit(0, value_data[0]));
+                        break;
+                    case FLAG_AUTO_DISABLE:
+                        via_update_config(4, 0, update_flag_bit(1, value_data[0]));
+                        break;
+                    case FLAG_AUTO_SWAP:
+                        via_update_config(4, 0, update_flag_bit(2, value_data[0]));
+                        if (value_data[0]) {
+                            akc_env_setup_swap_ag(detected_host_os());
+                        } else {
+                            akc_env_setup_swap_ag(OS_UNSURE);  // Disable swap by passing non-macOS OS
+                        }
                         break;
                     default:
                         *command_id = id_unhandled;

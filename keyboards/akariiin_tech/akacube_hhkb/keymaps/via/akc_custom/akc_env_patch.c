@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "akc_custom.h"
+#include "eeconfig.h"
 
 // Ensure default layer state is valid
 static bool is_valid_default_layer(uint32_t mask) {
@@ -16,9 +17,6 @@ void akc_env_init_layer_state(void) {
     layer_state |= default_layer_state;
 }
 
-#ifdef AKC_AUTO_SWAP_AG
-#include "eeconfig.h"
-
 // OS-based Alt/GUI swap configuration
 void akc_env_setup_swap_ag(os_variant_t host_os) {
     bool should_swap = host_os == OS_MACOS || host_os == OS_IOS;
@@ -32,4 +30,3 @@ void akc_env_setup_swap_ag(os_variant_t host_os) {
     eeconfig_update_keymap(&keymap_config);
     clear_keyboard();
 }
-#endif

@@ -30,7 +30,7 @@ static uint16_t combo_timers[sizeof(combos) / sizeof(combos[0])] = {0};
 #ifdef AKC_COMBO_ALLOW_OVER16
 _Static_assert(NUM_COMBOS <= 32, "Too many combo definitions for uint32_t bitmask (max 32)");
 #else
-_Static_assert(NUM_COMBOS <= 16, "Too many combo definitions for uint16_t bitmask (max 16, or define AKC_COMBO_ALLOW_OVER16)");
+_Static_assert(NUM_COMBOS <= 16, "Too many combo definitions for uint16_t bitmask (max 16, or define AKC_COMBO_ALLOW_OVER16 for up to 32)");
 #endif
 
 // Static functions
