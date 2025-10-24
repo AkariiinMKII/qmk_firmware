@@ -39,17 +39,11 @@ static bool combo_ready(void) { return mod1_held && mod2_held; } // Mark as read
 // Bitmask operations for combo satisfied states (like QMK layer system)
 static inline void combo_satisfied_set(uint8_t combo_index, bool satisfied) {
 #ifdef AKC_COMBO_ALLOW_OVER16
-    if (satisfied) {
-        combo_satisfied_state |= (1UL << combo_index);
-    } else {
-        combo_satisfied_state &= ~(1UL << combo_index);
-    }
+    satisfied ? (combo_satisfied_state |= (1UL << combo_index))
+              : (combo_satisfied_state &= ~(1UL << combo_index));
 #else
-    if (satisfied) {
-        combo_satisfied_state |= (1U << combo_index);
-    } else {
-        combo_satisfied_state &= ~(1U << combo_index);
-    }
+    satisfied ? (combo_satisfied_state |= (1U << combo_index))
+              : (combo_satisfied_state &= ~(1U << combo_index));
 #endif
 }
 

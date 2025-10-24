@@ -13,8 +13,8 @@
         "command": false,
         "console": false,
         "extrakey": true,
-        "mousekey": true,
-        "nkro": true
+        "nkro": true,
+        "rgblight": true
     },
     "usb": {
         "device_version": "2.1.0",

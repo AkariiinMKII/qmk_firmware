@@ -7,10 +7,8 @@
 
 # ------------------ Feature Enables ------------------
 VIA_ENABLE = yes             # VIA keymap configuration support
-RGBLIGHT_ENABLE = yes        # RGB lighting support
 MOUSEKEY_ENABLE = yes        # Mouse key support
 OS_DETECTION_ENABLE = yes    # Operating system detection support
-LTO_ENABLE = yes             # Link Time Optimization for smaller firmware
 
 # ------------------ Drivers ------------------
 WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling
