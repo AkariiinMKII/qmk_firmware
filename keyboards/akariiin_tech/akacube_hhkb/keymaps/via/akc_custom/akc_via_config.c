@@ -47,7 +47,7 @@ static bool config_loaded = false;
 static uint8_t via_config[5][3];
 
 // Validation functions
-static bool is_valid_lock_led_value(uint8_t value) {
+static bool is_valid_lockled_mask(uint8_t value) {
     return (value == 0 || value == 1 || value == 2 || value == 4 || value == 8 || value == 16);
 }
 
@@ -64,8 +64,9 @@ static bool is_valid_color_index(uint8_t value) {
 }
 
 static bool is_valid_config_matrix(uint8_t row, uint8_t col) {
-    if (row == 4 && col > 0) return false;
-    return (row <= 4 && col <= 2);
+    if (row < 4) { return (col <= 2); }
+    if (row == 4) { return (col == 0); }
+    return false;
 }
 
 // Data packing/unpacking functions
@@ -85,16 +86,13 @@ static void unpack_matrix_row(uint16_t packed, uint8_t row_index) {
 
 // Flag access functions
 static uint8_t update_flag_bit(uint8_t bit_index, bool value) {
-    if (value) {
-        via_config[4][0] |= (1 << bit_index);
-    } else {
-        via_config[4][0] &= ~(1 << bit_index);
-    }
+    value ? (via_config[4][0] |= (1 << bit_index))
+          : (via_config[4][0] &= ~(1 << bit_index));
     return via_config[4][0];
 }
 
 // VIA custom config I/O functions
-static void eeload_all_config(void) {
+static void eeload_config_all(void) {
     uint8_t config[10];
     via_read_custom_config(config, 0, 10);
     for (uint8_t row = 0; row < 5; row++) {
@@ -104,7 +102,7 @@ static void eeload_all_config(void) {
     }
 }
 
-static void eesave_all_config(void) {
+static void eesave_config_all(void) {
     uint8_t config[10];
     for (uint8_t row = 0; row < 5; row++) {
         uint16_t packed = pack_matrix_row(row);
@@ -144,7 +142,7 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
     switch (col_index) {
         case 0:
             if (row_index < 3) {
-                is_valid = is_valid_lock_led_value(new_value);
+                is_valid = is_valid_lockled_mask(new_value);
             } else if (row_index == 3) {
                 is_valid = is_valid_timeout_value(new_value);
             } else {
@@ -176,7 +174,7 @@ void akc_via_init_config(void) {
         {0x86, 0, 0}                      // row 4: flags (0b10000110: bit7=valid, bit2|1=flags) + reserved
     };
 
-    eeload_all_config();
+    eeload_config_all();
 
     // Validate loaded config per-row (handles corrupted data)
     for (uint8_t row = 0; row < 5; row++) {
@@ -184,7 +182,7 @@ void akc_via_init_config(void) {
 
         if (row < 3) {
             // Validate LED row
-            if (!is_valid_lock_led_value(via_config[row][0]) ||
+            if (!is_valid_lockled_mask(via_config[row][0]) ||
                 !is_valid_color_index(via_config[row][1]) ||
                 !is_valid_color_index(via_config[row][2])) {
                 should_reset_row = true;
@@ -216,7 +214,7 @@ void akc_via_init_config(void) {
 }
 
 void akc_via_save_config(void) {
-    eesave_all_config();
+    eesave_config_all();
 }
 
 // Public API functions
@@ -234,12 +232,13 @@ bool akc_via_get_flag(uint8_t flag_index) {
 }
 
 bool akc_via_lock_system_enabled(void) {
+    if ((via_config[0][0] | via_config[1][0] | via_config[2][0]) == 0) return false;
+
     if (akc_via_get_flag(1)) {
         os_variant_t host_os = detected_host_os();
-        bool os_supported = (host_os == OS_WINDOWS || host_os == OS_LINUX);
-        if (!os_supported) return false;
+        if (host_os == OS_MACOS || host_os == OS_IOS) return false;
     }
-    return (via_config[0][0] | via_config[1][0] | via_config[2][0]) > 0;
+    return true;
 }
 
 // VIA protocol handler
@@ -355,11 +354,7 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         break;
                     case FLAG_AUTO_SWAP:
                         via_update_config(4, 0, update_flag_bit(2, value_data[0]));
-                        if (value_data[0]) {
-                            akc_env_setup_swap_ag(detected_host_os());
-                        } else {
-                            akc_env_setup_swap_ag(OS_UNSURE);  // Disable swap by passing non-macOS OS
-                        }
+                        akc_env_setup_swap_ag(value_data[0] ? detected_host_os() : OS_UNSURE);
                         break;
                     default:
                         *command_id = id_unhandled;
