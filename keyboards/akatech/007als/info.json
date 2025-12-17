@@ -1,5 +1,5 @@
 {
-    "manufacturer": "Akariiin Tech",
+    "manufacturer": "AkaTech",
     "keyboard_name": "007aLS",
     "maintainer": "AkariiinMKII",
     "bootloader": "stm32duino",
@@ -21,7 +21,7 @@
     "usb": {
         "device_version": "0.1.0",
         "pid": "0x00C0",
-        "vid": "0x9C9E"
+        "vid": "0xA1CA"
     },
     "layouts": {
         "LAYOUT_7u_space": {
