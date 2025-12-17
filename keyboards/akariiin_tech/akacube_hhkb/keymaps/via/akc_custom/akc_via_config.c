@@ -171,7 +171,7 @@ void akc_via_init_config(void) {
         {AKC_LOCKLED_1, 1, 5},            // 1: Red, 5: Green
         {AKC_LOCKLED_2, 1, 5},            // 1: Red, 5: Green
         {(AKC_LED_KEEPTIME / 100), 1, 9}, // 1: Red, 9: Blue
-        {0x86, 0, 0}                      // row 4: flags (0b10000110: bit7=valid, bit2|1=flags) + reserved
+        {0x86, 0, 0}                      // row 4: flags (0b10000110: bit7=valid, bit2|1|0=flags) + reserved
     };
 
     eeload_config_all();
@@ -189,16 +189,16 @@ void akc_via_init_config(void) {
             }
         } else if (row == 3) {
             // Validate timeout row (row 3)
-            if (!is_valid_timeout_value(via_config[3][0]) ||
-                !is_valid_color_index(via_config[3][1]) ||
-                !is_valid_color_index(via_config[3][2])) {
+            if (!is_valid_timeout_value(via_config[row][0]) ||
+                !is_valid_color_index(via_config[row][1]) ||
+                !is_valid_color_index(via_config[row][2])) {
                 should_reset_row = true;
             }
         } else {
             // Validate flags row (row 4)
-            if (!is_valid_flag_group(via_config[4][0]) ||
-                via_config[4][1] > 0 ||
-                via_config[4][2] > 0) {
+            if (!is_valid_flag_group(via_config[row][0]) ||
+                via_config[row][1] > 0 ||
+                via_config[row][2] > 0) {
                 should_reset_row = true;
             }
         }
@@ -219,7 +219,7 @@ void akc_via_save_config(void) {
 
 // Public API functions
 uint8_t akc_via_get_config(uint8_t row, uint8_t col) {
-    if (!is_valid_config_matrix(row, col) || (row == 3 && col == 0)) return 0;
+    if (!is_valid_config_matrix(row, col) || (row > 2 && col == 0)) return 0;
     return via_config[row][col];
 }
 
