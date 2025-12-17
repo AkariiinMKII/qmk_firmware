@@ -36,12 +36,6 @@ bool mnm_via_lock_system_enabled(void);
 void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 
 // mnm_rgblight_layers.c
-#ifndef MNM_COLOR_LAYERLED_BG
-#    define MNM_COLOR_LAYERLED_BG     HSV_RED_DIM
-#endif
-#ifndef MNM_COLOR_LAYERLED_MO0
-#    define MNM_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
-#endif
 #ifndef MNM_COLOR_LAYERLED_MO1
 #    define MNM_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
 #endif
@@ -60,14 +54,11 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 #ifndef MNM_COLOR_LOCKLED_1
 #    define MNM_COLOR_LOCKLED_1       HSV_GREEN_DIM
 #endif
-#ifndef MNM_COLOR_LOCKLED_2
-#    define MNM_COLOR_LOCKLED_2       HSV_GREEN_DIM
-#endif
 #ifndef MNM_COLOR_BLINK
 #    define MNM_COLOR_BLINK           HSV_RED_DIM
 #endif
 #ifndef MNM_LAYERLED_POSITIONS
-#    define MNM_LAYERLED_POSITIONS {0, 1, 2, 3}
+#    define MNM_LAYERLED_POSITIONS {0, 1}
 #endif
 #ifndef MNM_LAYERLED_LENGTH
 #    define MNM_LAYERLED_LENGTH 1
@@ -77,7 +68,7 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 #    define MNM_LAYERLED_LENGTH 1
 #endif
 #ifndef MNM_LOCKLED_POSITIONS
-#    define MNM_LOCKLED_POSITIONS {0, 1, 2}
+#    define MNM_LOCKLED_POSITIONS {0, 1}
 #endif
 #ifndef MNM_LOCKLED_LENGTH
 #    define MNM_LOCKLED_LENGTH 1
@@ -95,11 +86,6 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length);
 #    define MNM_COLOR_LOCKLED_BG1 MNM_COLOR_LOCKLED_BG
 #else
 #    define MNM_COLOR_LOCKLED_BG1 HSV_BLACK
-#endif
-#if MNM_LOCKLED_2 > 0
-#    define MNM_COLOR_LOCKLED_BG2 MNM_COLOR_LOCKLED_BG
-#else
-#    define MNM_COLOR_LOCKLED_BG2 HSV_BLACK
 #endif
 
 void mnm_rgblight_layers_init(void);

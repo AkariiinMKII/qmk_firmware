@@ -4,7 +4,7 @@
 #include "mnm_custom.h"
 
 // Compile-time check to ensure VIA custom config space is sufficient
-_Static_assert(VIA_EEPROM_CUSTOM_CONFIG_SIZE >= 10, "VIA custom config size too small for configuration");
+_Static_assert(VIA_EEPROM_CUSTOM_CONFIG_SIZE >= 8, "VIA custom config size too small for configuration");
 
 // VIA Configuration Channel IDs
 enum via_config_channels {
