@@ -1,7 +1,7 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_custom.h"
+#include "mnm_custom.h"
 
 // Compile-time check to ensure VIA custom config space is sufficient
 _Static_assert(VIA_EEPROM_CUSTOM_CONFIG_SIZE >= 10, "VIA custom config size too small for configuration");
@@ -163,14 +163,14 @@ static bool via_update_config(uint8_t row_index, uint8_t col_index, uint8_t new_
 }
 
 // Initialize VIA configuration from EEPROM VIA custom config area
-void akc_via_init_config(void) {
+void mnm_via_init_config(void) {
     if (config_loaded) return;
 
     static const uint8_t default_config[5][3] = {
-        {AKC_LOCKLED_0, 1, 5},            // 1: Red, 5: Green
-        {AKC_LOCKLED_1, 1, 5},            // 1: Red, 5: Green
-        {AKC_LOCKLED_2, 1, 5},            // 1: Red, 5: Green
-        {(AKC_LED_KEEPTIME / 100), 1, 9}, // 1: Red, 9: Blue
+        {MNM_LOCKLED_0, 1, 5},            // 1: Red, 5: Green
+        {MNM_LOCKLED_1, 1, 5},            // 1: Red, 5: Green
+        {MNM_LOCKLED_2, 1, 5},            // 1: Red, 5: Green
+        {(MNM_LED_KEEPTIME / 100), 1, 9}, // 1: Red, 9: Blue
         {0x86, 0, 0}                      // row 4: flags (0b10000110: bit7=valid, bit2|1=flags) + reserved
     };
 
@@ -213,28 +213,28 @@ void akc_via_init_config(void) {
     config_loaded = true;
 }
 
-void akc_via_save_config(void) {
+void mnm_via_save_config(void) {
     eesave_config_all();
 }
 
 // Public API functions
-uint8_t akc_via_get_config(uint8_t row, uint8_t col) {
+uint8_t mnm_via_get_config(uint8_t row, uint8_t col) {
     if (!is_valid_config_matrix(row, col) || (row == 3 && col == 0)) return 0;
     return via_config[row][col];
 }
 
-uint8_t akc_via_get_led_timeout(void) {
+uint8_t mnm_via_get_led_timeout(void) {
     return via_config[3][0];
 }
 
-bool akc_via_get_flag(uint8_t flag_index) {
+bool mnm_via_get_flag(uint8_t flag_index) {
     return (via_config[4][0] >> flag_index) & 0x1;
 }
 
-bool akc_via_lock_system_enabled(void) {
+bool mnm_via_lock_system_enabled(void) {
     if ((via_config[0][0] | via_config[1][0] | via_config[2][0]) == 0) return false;
 
-    if (akc_via_get_flag(1)) {
+    if (mnm_via_get_flag(1)) {
         os_variant_t host_os = detected_host_os();
         if (host_os == OS_MACOS || host_os == OS_IOS) return false;
     }
@@ -290,13 +290,13 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         value_data[0] = via_config[3][0];
                         break;
                     case FLAG_OVERRIDE_LAYERLED:
-                        value_data[0] = akc_via_get_flag(0);
+                        value_data[0] = mnm_via_get_flag(0);
                         break;
                     case FLAG_AUTO_DISABLE:
-                        value_data[0] = akc_via_get_flag(1);
+                        value_data[0] = mnm_via_get_flag(1);
                         break;
                     case FLAG_AUTO_SWAP:
-                        value_data[0] = akc_via_get_flag(2);
+                        value_data[0] = mnm_via_get_flag(2);
                         break;
                     default:
                         *command_id = id_unhandled;
@@ -354,21 +354,21 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                         break;
                     case FLAG_AUTO_SWAP:
                         via_update_config(4, 0, update_flag_bit(2, value_data[0]));
-                        akc_env_setup_swap_ag(value_data[0] ? detected_host_os() : OS_UNSURE);
+                        mnm_env_setup_swap_ag(value_data[0] ? detected_host_os() : OS_UNSURE);
                         break;
                     default:
                         *command_id = id_unhandled;
                         return;
                 }
 
-                if (should_refresh_lockled) { akc_led_refresh_lockled(); }
-                if (should_refresh_layerled) { akc_led_refresh_layerled(); }
-                if (should_init_lockled) { akc_led_init_lockled(); }
-                if (should_init_layerled) { akc_led_init_layerled(); }
+                if (should_refresh_lockled) { mnm_led_refresh_lockled(); }
+                if (should_refresh_layerled) { mnm_led_refresh_layerled(); }
+                if (should_init_lockled) { mnm_led_init_lockled(); }
+                if (should_init_layerled) { mnm_led_init_layerled(); }
                 break;
             }
             case id_custom_save: {
-                akc_via_save_config();
+                mnm_via_save_config();
                 break;
             }
             default:

@@ -1,10 +1,10 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_custom.h"
+#include "mnm_custom.h"
 
 // Show layer indicators with bit checks
-void akc_layer_indicator_show(layer_state_t state) {
+void mnm_layer_indicator_show(layer_state_t state) {
     rgblight_set_layer_state(0, true);              // All-black background
     rgblight_set_layer_state(1, true);              // Layer off-color
     rgblight_set_layer_state(2, (state & 1) > 0);   // Layer 0 indicator
@@ -14,7 +14,7 @@ void akc_layer_indicator_show(layer_state_t state) {
 }
 
 // Hide all layer indicators
-void akc_layer_indicator_hide(void) {
+void mnm_layer_indicator_hide(void) {
     for (uint8_t i = 0; i < 6; i++) {
         rgblight_set_layer_state(i, false);
     }

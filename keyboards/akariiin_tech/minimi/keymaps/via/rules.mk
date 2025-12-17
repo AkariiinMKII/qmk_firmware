@@ -14,12 +14,12 @@ OS_DETECTION_ENABLE = yes    # Operating system detection support
 WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling
 
 # ------------------ User Space Source Files ------------------
-SRC += akc_custom/akc_combo.c           # Combo key sequences
-SRC += akc_custom/akc_env_patch.c       # Environment initialization fix
-SRC += akc_custom/akc_layer_indicator.c # Layer indicator system library
-SRC += akc_custom/akc_led_blink.c       # LED blink effects
-SRC += akc_custom/akc_led_control.c     # LED control coordination
-SRC += akc_custom/akc_lock_indicator.c  # Lock indicator system library
-SRC += akc_custom/akc_rgb_colors.c      # RGB color definitions
-SRC += akc_custom/akc_rgblight_layers.c # RGB light layer management
-SRC += akc_custom/akc_via_config.c      # VIA configuration system
+SRC += mnm_custom/mnm_combo.c           # Combo key sequences
+SRC += mnm_custom/mnm_env_patch.c       # Environment initialization fix
+SRC += mnm_custom/mnm_layer_indicator.c # Layer indicator system library
+SRC += mnm_custom/mnm_led_blink.c       # LED blink effects
+SRC += mnm_custom/mnm_led_control.c     # LED control coordination
+SRC += mnm_custom/mnm_lock_indicator.c  # Lock indicator system library
+SRC += mnm_custom/mnm_rgb_colors.c      # RGB color definitions
+SRC += mnm_custom/mnm_rgblight_layers.c # RGB light layer management
+SRC += mnm_custom/mnm_via_config.c      # VIA configuration system

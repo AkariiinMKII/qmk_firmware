@@ -1,13 +1,13 @@
 // Copyright 2025 AkariiinL (@AkariiinMKII)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "akc_custom.h"
+#include "mnm_custom.h"
 
 // Show lock indicators - black background if any enabled, color backgrounds if enabled, indicators if active
-void akc_lock_indicator_show(uint8_t lock_state) {
-    uint8_t led0 = akc_via_get_config(LOCK_LED_0, BITMASK);
-    uint8_t led1 = akc_via_get_config(LOCK_LED_1, BITMASK);
-    uint8_t led2 = akc_via_get_config(LOCK_LED_2, BITMASK);
+void mnm_lock_indicator_show(uint8_t lock_state) {
+    uint8_t led0 = mnm_via_get_config(LOCK_LED_0, BITMASK);
+    uint8_t led1 = mnm_via_get_config(LOCK_LED_1, BITMASK);
+    uint8_t led2 = mnm_via_get_config(LOCK_LED_2, BITMASK);
 
     // All-black background (if any lock LED is enabled)
     rgblight_set_layer_state(6, (led0 | led1 | led2) > 0);
@@ -24,7 +24,7 @@ void akc_lock_indicator_show(uint8_t lock_state) {
 }
 
 // Hide all lock indicators
-void akc_lock_indicator_hide(void) {
+void mnm_lock_indicator_hide(void) {
     for (uint8_t i = 6; i < 13; i++) {
         rgblight_set_layer_state(i, false);
     }

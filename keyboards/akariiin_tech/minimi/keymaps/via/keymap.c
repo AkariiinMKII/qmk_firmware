@@ -2,46 +2,46 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
-#include "akc_custom/akc_custom.h"
+#include "mnm_custom/mnm_custom.h"
 
 // Initialize VIA configuration on startup
 void keyboard_post_init_user(void) {
-    akc_env_init_layer_state();  // Workaround for layer_state initialization issue
-    akc_via_init_config();  // Load VIA configurations
-    akc_led_init_lockled();  // Initialize RGB light layers
+    mnm_env_init_layer_state();  // Workaround for layer_state initialization issue
+    mnm_via_init_config();  // Load VIA configurations
+    mnm_led_init_lockled();  // Initialize RGB light layers
 }
 
 // OS-based configurations on host OS detection event
 bool process_detected_host_os_user(os_variant_t host_os) {
     if (host_os == OS_UNSURE) return true;
-    if (akc_via_get_flag(AUTO_SWAP)) { akc_env_setup_swap_ag(host_os); }
-    if (akc_via_get_flag(AUTO_DISABLE)) { akc_led_init_lockled(); }
+    if (mnm_via_get_flag(AUTO_SWAP)) { mnm_env_setup_swap_ag(host_os); }
+    if (mnm_via_get_flag(AUTO_DISABLE)) { mnm_led_init_lockled(); }
     return true;
 }
 
 // Update RGB indicators when lock states change
 bool led_update_user(led_t led_state) {
-    akc_led_lock_indicator_update(led_state);
+    mnm_led_lock_indicator_update(led_state);
     return true;
 }
 
 // Update RGB indicators when layers change
 layer_state_t layer_state_set_user(layer_state_t state) {
-    akc_led_layer_indicator_update(state);
+    mnm_led_layer_indicator_update(state);
     return state;
 }
 
 // Process combo detection for key events
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    return akc_combo_check(keycode, record->event.pressed);
+    return mnm_combo_check(keycode, record->event.pressed);
 }
 
 // Process LED timeouts and combo updates
 void matrix_scan_user(void) {
-    if (akc_led_lockled_timer_active()) { akc_led_lock_indicator_timer(); }
-    if (akc_led_layerled_timer_active()) { akc_led_layer_indicator_timer(); }
-    if (akc_combo_any_active()) { akc_combo_handler(); }
-    if (akc_led_blink_timer_active()) { akc_led_blink_timer(); }
+    if (mnm_led_lockled_timer_active()) { mnm_led_lock_indicator_timer(); }
+    if (mnm_led_layerled_timer_active()) { mnm_led_layer_indicator_timer(); }
+    if (mnm_combo_any_active()) { mnm_combo_handler(); }
+    if (mnm_led_blink_timer_active()) { mnm_led_blink_timer(); }
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
