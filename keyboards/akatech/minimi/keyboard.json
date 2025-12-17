@@ -1,5 +1,5 @@
 {
-    "manufacturer": "AkariiinTech",
+    "manufacturer": "AkaTech",
     "keyboard_name": "MiniMi",
     "url": "",
     "maintainer": "AkariiinMKII",
@@ -19,7 +19,7 @@
     "usb": {
         "device_version": "1.0.0",
         "pid": "0xA323",
-        "vid": "0x9C9E",
+        "vid": "0xA1CA",
         "max_power": 500,
         "polling_interval": 1
 
