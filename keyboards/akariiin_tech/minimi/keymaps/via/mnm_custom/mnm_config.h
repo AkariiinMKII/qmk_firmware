@@ -20,8 +20,6 @@ void mnm_led_blink_hide(void);
 // ==================== RGB LED COLORS =====================
 
 // Layer indicator colors (overwritten by VIA config)
-#define MNM_COLOR_LAYERLED_BG     HSV_RED_DIM  // Off state color
-#define MNM_COLOR_LAYERLED_MO0    HSV_BLUE_DIM
 #define MNM_COLOR_LAYERLED_MO1    HSV_BLUE_DIM
 #define MNM_COLOR_LAYERLED_MO2    HSV_BLUE_DIM
 #define MNM_COLOR_LAYERLED_MO3    HSV_BLUE_DIM
@@ -30,7 +28,6 @@ void mnm_led_blink_hide(void);
 #define MNM_COLOR_LOCKLED_BG      HSV_RED_DIM   // Off state color
 #define MNM_COLOR_LOCKLED_0       HSV_GREEN_DIM
 #define MNM_COLOR_LOCKLED_1       HSV_GREEN_DIM
-#define MNM_COLOR_LOCKLED_2       HSV_GREEN_DIM
 
 // Blink effect color
 #define MNM_COLOR_BLINK           HSV_RED_DIM
@@ -46,12 +43,12 @@ void mnm_led_blink_hide(void);
 // Indicator positions for 4 keymap layers
 // - Starting number of LEDs for each layer indicator (layer 0,1,2,3)
 // - LEDs count starts from 0
-#define MNM_LAYERLED_POSITIONS {1, 3, 5, 7}
+#define MNM_LAYERLED_POSITIONS {0, 2}
 
 // Layer LED length
 // - Number of LEDs used for each indicator
 // - Should not be greater than the step to next position
-#define MNM_LAYERLED_LENGTH 1
+#define MNM_LAYERLED_LENGTH 2
 
 // ================= LOCK INDICATOR SYSTEM =================
 
@@ -60,7 +57,7 @@ void mnm_led_blink_hide(void);
 // Indicator positions for 3 lock states
 // - Starting number of LEDs for each lock indicator (lock 0,1,2)
 // - LEDs count starts from 0
-#define MNM_LOCKLED_POSITIONS {0, 3, 6}
+#define MNM_LOCKLED_POSITIONS {0, 2}
 
 // Lock LED length
 // - Number of LEDs used for each indicator
@@ -70,9 +67,8 @@ void mnm_led_blink_hide(void);
 // Lock LED mapping configuration (overwritten by VIA config)
 // - Available values: 0=disable, 1=numlock, 2=capslock, 4=scrolllock, 8=compose, 16=kana
 // - Setting all LOCKLEDs to 0 will disable the entire lock indicator system and force enable layer indicators
-#define MNM_LOCKLED_0 1  // numlock
-#define MNM_LOCKLED_1 2  // capslock
-#define MNM_LOCKLED_2 4  // scrolllock
+#define MNM_LOCKLED_0 2
+#define MNM_LOCKLED_1 0
 
 // =================== LED BLINK SYSTEM ====================
 

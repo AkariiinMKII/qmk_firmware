@@ -8,15 +8,15 @@ static bool blink_active = false;
 static bool blink_led_on = false;
 static uint16_t blink_timer = 0;
 
-// Show LED blink effect on LEDs 0-7
+// Show LED blink effect
 void mnm_led_blink_show(void) {
     if (!blink_active) {
         blink_active = true;
         blink_led_on = true;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(13, true);  // Background layer
-        rgblight_set_layer_state(14, true);  // Blink color layer
+        rgblight_set_layer_state(7, true);  // Background layer
+        rgblight_set_layer_state(8, true);  // Blink color layer
     }
 }
 
@@ -27,8 +27,8 @@ void mnm_led_blink_hide(void) {
         blink_led_on = false;
         blink_timer = 0;
 
-        rgblight_set_layer_state(13, false); // Background layer off
-        rgblight_set_layer_state(14, false); // Blink color layer off
+        rgblight_set_layer_state(7, false); // Background layer off
+        rgblight_set_layer_state(8, false); // Blink color layer off
     }
 }
 
@@ -41,7 +41,7 @@ void mnm_led_blink_timer(void) {
         blink_led_on = !blink_led_on;
         blink_timer = timer_read();
 
-        rgblight_set_layer_state(14, blink_led_on);  // Toggle blink color layer
+        rgblight_set_layer_state(8, blink_led_on);  // Toggle blink color layer
     }
 }
 

@@ -55,8 +55,7 @@ void mnm_led_lock_indicator_update(led_t led_state) {
 
     // Get current lock state for enabled LEDs
     uint8_t lock_current_mask = mnm_via_get_config(LOCK_LED_0, BITMASK) |
-                               mnm_via_get_config(LOCK_LED_1, BITMASK) |
-                               mnm_via_get_config(LOCK_LED_2, BITMASK);
+                               mnm_via_get_config(LOCK_LED_1, BITMASK);
     uint8_t lock_current_state = led_state.raw & lock_current_mask;
 
     // Only update if state changed

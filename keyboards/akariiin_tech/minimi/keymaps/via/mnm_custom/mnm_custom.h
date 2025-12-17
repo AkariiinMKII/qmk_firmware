@@ -11,14 +11,14 @@
 enum mnm_config_rows {
     LOCK_LED_0 = 0,
     LOCK_LED_1 = 1,
-    LOCK_LED_2 = 2,
-    LAYER_LED = 3
+    LAYER_LED = 2
 };
 
 enum mnm_config_cols {
     BITMASK = 0,
     OFF_COLOR = 1,
-    ON_COLOR = 2
+    ON_COLOR = 2,
+    L3_COLOR = 1
 };
 
 enum mnm_config_flags {
