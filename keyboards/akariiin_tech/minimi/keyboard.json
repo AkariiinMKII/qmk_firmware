@@ -18,8 +18,8 @@
     },
     "usb": {
         "device_version": "1.0.0",
-        "pid": "0x3F54",
-        "vid": "0xA323",
+        "pid": "0xA323",
+        "vid": "0x9C9E",
         "max_power": 500,
         "polling_interval": 1
 
