@@ -92,7 +92,6 @@ void mnm_rgblight_layers_init(void);
 
 // mnm_layer_indicator.c
 void mnm_layer_indicator_show(layer_state_t state);
-void mnm_layer_indicator_hide(void);
 
 // mnm_lock_indicator.c
 void mnm_lock_indicator_show(uint8_t lock_state);
@@ -139,13 +138,11 @@ bool mnm_combo_any_active(void);
 void mnm_led_lock_indicator_update(led_t led_state);
 void mnm_led_lock_indicator_timer(void);
 void mnm_led_layer_indicator_update(layer_state_t state);
-void mnm_led_layer_indicator_timer(void);
 void mnm_led_refresh_lockled(void);
 void mnm_led_refresh_layerled(void);
 void mnm_led_init_lockled(void);
 void mnm_led_init_layerled(void);
 bool mnm_led_lockled_timer_active(void);
-bool mnm_led_layerled_timer_active(void);
 
 // mnm_rgb_colors.c
 HSV mnm_color_pick_dim_color(uint8_t color_index);
