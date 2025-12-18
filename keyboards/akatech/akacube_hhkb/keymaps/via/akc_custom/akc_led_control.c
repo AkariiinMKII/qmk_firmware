@@ -5,22 +5,22 @@
 
 // Lock LED state variables
 static uint8_t lock_last_state = 0;
-static bool lockled_active = false;
+static bool lockled_timer_active = false;
 static uint16_t lockled_timer = 0;
 
 // Layer LED state variables
 static layer_state_t layer_last_state = 0;
-static bool layerled_active = false;
+static bool layerled_timer_active = false;
 static uint16_t layerled_timer = 0;
 
 // Lock LED timer control functions
 static void lock_indicator_timer_start(void) {
-    lockled_active = true;
+    lockled_timer_active = true;
     lockled_timer = timer_read();
 }
 
 static void lock_indicator_timer_reset(void) {
-    lockled_active = false;
+    lockled_timer_active = false;
     lockled_timer = 0;
 }
 
@@ -33,12 +33,12 @@ void akc_led_lock_indicator_timer(void) {
 
 // Layer LED timer control functions
 static void layer_indicator_timer_start(void) {
-    layerled_active = true;
+    layerled_timer_active = true;
     layerled_timer = timer_read();
 }
 
 static void layer_indicator_timer_reset(void) {
-    layerled_active = false;
+    layerled_timer_active = false;
     layerled_timer = 0;
 }
 
@@ -100,8 +100,8 @@ void akc_led_layer_indicator_update(layer_state_t state) {
 
 // Switch active indicators
 static void switch_layerled_to_lockled(void) {
-    if (layerled_active) {
-        lockled_active = true;
+    if (layerled_timer_active) {
+        lockled_timer_active = true;
         lockled_timer = layerled_timer; // Transfer remaining time
         layer_indicator_timer_reset();
         akc_layer_indicator_hide();
@@ -110,8 +110,8 @@ static void switch_layerled_to_lockled(void) {
 }
 
 static void switch_lockled_to_layerled(void) {
-    if (lockled_active) {
-        layerled_active = true;
+    if (lockled_timer_active) {
+        layerled_timer_active = true;
         layerled_timer = lockled_timer; // Transfer remaining time
         lock_indicator_timer_reset();
         akc_lock_indicator_hide();
@@ -184,5 +184,5 @@ void akc_led_init_layerled(void) {
 }
 
 // Expose LED timers active state for matrix scan
-bool akc_led_lockled_timer_active(void) { return lockled_active; }
-bool akc_led_layerled_timer_active(void) { return layerled_active; }
+bool akc_led_lockled_timer_active(void) { return lockled_timer_active; }
+bool akc_led_layerled_timer_active(void) { return layerled_timer_active; }
