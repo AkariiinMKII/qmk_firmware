@@ -53,9 +53,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * │TAB │ A │ S │ D │ F │ G │ H │ J │ K │ L │ ENT  │
      * ├────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬────┤
      * │ SFT  │ Z │ X │ C │ V │ B │ N │ M │ , │ . │SFT │
-     * └┬───┬─┴─┬─┴──┬┴──┬┴───┴───┴──┬┴──┬┴───┼───┼───┬┘
-     *  │CTL│GUI│ALT │MO1│  SPACE    │MO2│ALT │GUI│CTL│
-     *  └───┴───┴────┴───┴───────────┴───┴────┴───┴───┘
+     * └┬───┬─┴─┬─┴─┬─┴──┬┴───┴───┴──┬┴───┼───┼───┼───┬┘
+     *  │CTL│GUI│ALT│MO1 │   SPACE   │MO2 │ALT│GUI│CTL│
+     *  └───┴───┴───┴────┴───────────┴────┴───┴───┴───┘
      */
     [0] = LAYOUT_quark(
         KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
@@ -72,9 +72,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * │TAB │   │   │   │   │ - │ = │ [ │ ] │ \ │ ENT  │
      * ├────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬────┤
      * │ SFT  │   │   │   │   │   │ ; │ ' │ / │ ↑ │SFT │
-     * └┬───┬─┴─┬─┴──┬┴──┬┴───┴───┴──┬┴──┬┴───┼───┼───┬┘
-     *  │CTL│GUI│ALT │MO1│  SPACE    │MO2│  ← │ ↓ │ → │
-     *  └───┴───┴────┴───┴───────────┴───┴────┴───┴───┘
+     * └┬───┬─┴─┬─┴─┬─┴──┬┴───┴───┴──┬┴───┼───┼───┼───┬┘
+     *  │CTL│GUI│ALT│MO1 │   SPACE   │MO2 │ ← │ ↓ │ → │
+     *  └───┴───┴───┴────┴───────────┴────┴───┴───┴───┘
      */
      [1] = LAYOUT_quark(
         KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL,
@@ -91,9 +91,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * │CAPS│   │   │   │   │ _ │ + │ { │ } │ | │ ENT  │
      * ├────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬────┤
      * │ SFT  │   │   │   │   │   │ : │ " │ ? │ ↑ │SFT │
-     * └┬───┬─┴─┬─┴──┬┴──┬┴───┴───┴──┬┴──┬┴───┼───┼───┬┘
-     *  │CTL│GUI│ALT │TG3│  SPACE    │MO2│  ← │ ↓ │ → │
-     *  └───┴───┴────┴───┴───────────┴───┴────┴───┴───┘
+     * └┬───┬─┴─┬─┴─┬─┴──┬┴───┴───┴──┬┴───┼───┼───┼───┬┘
+     *  │CTL│GUI│ALT│TG3 │   SPACE   │MO2 │ ← │ ↓ │ → │
+     *  └───┴───┴───┴────┴───────────┴────┴───┴───┴───┘
      */
     [2] = LAYOUT_quark(
         KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
@@ -110,9 +110,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * │    │F5 │F6 │F7 │F8 │   │   │INS│HOM│PGU│ ENT  │
      * ├────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬────┤
      * │ SFT  │F9 │F10│F11│F12│   │   │DEL│END│PGD│SFT │
-     * └┬───┬─┴─┬─┴──┬┴──┬┴───┴───┴──┬┴──┬┴───┼───┼───┬┘
-     *  │CTL│GUI│ALT │TG3│  SPACE    │TG3│ALT │GUI│CTL│
-     *  └───┴───┴────┴───┴───────────┴───┴────┴───┴───┘
+     * └┬───┬─┴─┬─┴─┬─┴──┬┴───┴───┴──┬┴───┼───┼───┼───┬┘
+     *  │CTL│GUI│ALT│TG3 │   SPACE   │TG3 │ALT│GUI│CTL│
+     *  └───┴───┴───┴────┴───────────┴────┴───┴───┴───┘
      */
     [3] = LAYOUT_quark(
         KC_ESC,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_NO,   KC_NO,   KC_PSCR, KC_SCRL, KC_PAUS, KC_NO,   KC_NO,
