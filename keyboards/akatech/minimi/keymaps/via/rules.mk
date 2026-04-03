@@ -9,6 +9,7 @@
 VIA_ENABLE = yes             # VIA keymap configuration support
 MOUSEKEY_ENABLE = yes        # Mouse key support
 OS_DETECTION_ENABLE = yes    # Operating system detection support
+TRI_LAYER_ENABLE = yes		 # Tri Layer support
 
 # ------------------ Drivers ------------------
 WEAR_LEVELING_DRIVER = embedded_flash  # Use embedded flash for wear leveling

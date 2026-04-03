@@ -1,1 +1,2 @@
 WEAR_LEVELING_DRIVER = embedded_flash
+TRI_LAYER_ENABLE = yes
